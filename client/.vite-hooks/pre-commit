@@ -1,0 +1,2 @@
+# Git runs hooks from the repo root; the Vite+ config lives in client/.
+cd client && vp staged

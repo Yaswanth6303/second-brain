@@ -1,0 +1,8 @@
+# OS
+.DS_Store
+
+# Local AI tooling state (claude-flow / ruvector / superpowers)
+.claude-flow/
+.swarm/
+ruvector.db
+.superpowers/

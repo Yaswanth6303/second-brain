@@ -1,0 +1,100 @@
+import { useEffect, useRef } from "react";
+import { useNavigate } from "react-router";
+import { useTheme } from "../../context/ThemeContext.tsx";
+import { useAuth } from "../../features/auth/index.ts";
+import { Avatar } from "../ui/Avatar.tsx";
+import { Button } from "../ui/Button.tsx";
+import { Dropdown, MenuItem } from "../ui/Dropdown.tsx";
+
+export function Topbar({ onMenu }: { onMenu: () => void }) {
+  const { user, logout } = useAuth();
+  const { theme, toggle } = useTheme();
+  const navigate = useNavigate();
+  const search = useRef<HTMLInputElement>(null);
+
+  // "/" focuses search, as in the prototype.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "/" && !/INPUT|TEXTAREA|SELECT/.test((e.target as HTMLElement).tagName)) {
+        e.preventDefault();
+        search.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
+  if (!user) return null;
+  return (
+    <header className="bg-bg border-line sticky top-[env(safe-area-inset-top,0px)] z-[1020] flex items-center gap-2 border-b px-[clamp(16px,3vw,32px)] py-2.5">
+      <button type="button" className="btn-icon lg:hidden" aria-label="Open menu" onClick={onMenu}>
+        <i className="bi bi-list" />
+      </button>
+      <div className="bg-surface border-line text-muted focus-within:border-brand flex max-w-[520px] min-w-0 flex-1 items-center gap-2 rounded-[10px] border px-2.5">
+        <i className="bi bi-search" />
+        <input
+          ref={search}
+          type="search"
+          placeholder="Search names, tags and notes"
+          aria-label="Search your library"
+          className="text-ink min-w-0 flex-1 border-0 bg-transparent py-2 outline-0"
+        />
+        <kbd className="bg-surface-2 text-muted hidden rounded-[5px] px-1.5 py-px font-mono text-[.72rem] md:inline">
+          /
+        </kbd>
+      </div>
+      <span className="hidden flex-1 md:block" />
+      {/* Saving links arrives in stage 2. */}
+      <Button disabled title="Coming in stage 2">
+        <i className="bi bi-plus-lg" />
+        <span className="hidden sm:inline">Add link</span>
+      </Button>
+      <Dropdown
+        label="Notifications"
+        trigger={<i className="bi bi-bell" />}
+        className="w-[min(330px,calc(100vw-32px))] p-1.5"
+      >
+        {() => (
+          <>
+            <h2 className="px-2 pt-2 pb-1">Notifications</h2>
+            <p className="meta px-2 pb-2">Nothing new yet.</p>
+          </>
+        )}
+      </Dropdown>
+      <button
+        type="button"
+        className="btn-icon"
+        aria-label="Switch between light and dark"
+        onClick={toggle}
+      >
+        <i className={`bi ${theme === "dark" ? "bi-sun" : "bi-moon-stars"}`} />
+      </button>
+      <Dropdown
+        label="Account menu"
+        triggerClassName="rounded-full"
+        trigger={<Avatar name={user.name} hue={user.hue} size={34} />}
+      >
+        {(close) => (
+          <div role="menu">
+            <h3 className="text-muted px-4 py-2 text-[.875rem] font-normal">
+              {user.name} · @{user.handle}
+            </h3>
+            <MenuItem icon="bi-person" onClick={() => (close(), void navigate("/profile"))}>
+              Profile
+            </MenuItem>
+            <MenuItem icon="bi-gear" onClick={() => (close(), void navigate("/profile/settings"))}>
+              Settings
+            </MenuItem>
+            <hr className="border-line my-2" />
+            <MenuItem
+              icon="bi-box-arrow-right"
+              onClick={() => void logout().then(() => navigate("/login"))}
+            >
+              Log out
+            </MenuItem>
+          </div>
+        )}
+      </Dropdown>
+    </header>
+  );
+}

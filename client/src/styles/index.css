@@ -1,0 +1,154 @@
+@import "tailwindcss";
+@import "bootstrap-icons/font/bootstrap-icons.css";
+
+/* Tokens copied from the prototype :root (second-brain-bootstrap.html). */
+@theme {
+  --color-bg: #f1f4f2;
+  --color-surface: #ffffff;
+  --color-surface-2: #e8eeeb;
+  --color-ink: #13201d;
+  --color-muted: #586865;
+  --color-line: #d9e2de;
+  --color-brand: rgb(14 106 91);
+  --color-brand-strong: #0a5246;
+  --color-brand-ink: #ffffff;
+  --color-brand-soft: #dcf0ea;
+  --color-mark: #ffd84d;
+  --color-mark-ink: #3a2e00;
+  --color-panel: #0b3d35;
+  --color-panel-ink: #e6f4f0;
+  --color-panel-card: #124e44;
+  --color-t-article: #2460c4;
+  --color-t-video: #cc4238;
+  --color-t-podcast: #7448cc;
+  --color-t-course: #96600c;
+  --color-t-tool: #1c8456;
+  --color-t-custom: #566579;
+  --color-on-type: #ffffff;
+  --color-card-ink: #f2f7f5;
+  --color-card-dim: rgb(242 247 245 / 0.74);
+  --color-card-line: rgb(242 247 245 / 0.24);
+  --color-ok: #1c8456;
+  --color-warn: #a8690f;
+  --color-danger: #c23b32;
+
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Instrument Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
+@layer base {
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --color-bg: #0d1412;
+      --color-surface: #151e1c;
+      --color-surface-2: #1f2a27;
+      --color-ink: #e5edea;
+      --color-muted: #93a39f;
+      --color-line: #27342f;
+      --color-brand: rgb(84 204 179);
+      --color-brand-strong: #86e0cd;
+      --color-brand-ink: #04211b;
+      --color-brand-soft: #15332d;
+      --color-mark: #f0c93a;
+      --color-mark-ink: #2b2200;
+      --color-panel: #0a2a25;
+      --color-panel-ink: #dff1ec;
+      --color-panel-card: #11392f;
+      --color-t-article: #5b93ea;
+      --color-t-video: #e2685e;
+      --color-t-podcast: #9a7be8;
+      --color-t-course: #bd8426;
+      --color-t-tool: #3dab78;
+      --color-t-custom: #8fa0b5;
+      --color-on-type: #0d1412;
+      --color-ok: #58c38f;
+      --color-warn: #e2ab4d;
+      --color-danger: #f17f75;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --color-bg: #0d1412;
+    --color-surface: #151e1c;
+    --color-surface-2: #1f2a27;
+    --color-ink: #e5edea;
+    --color-muted: #93a39f;
+    --color-line: #27342f;
+    --color-brand: rgb(84 204 179);
+    --color-brand-strong: #86e0cd;
+    --color-brand-ink: #04211b;
+    --color-brand-soft: #15332d;
+    --color-mark: #f0c93a;
+    --color-mark-ink: #2b2200;
+    --color-panel: #0a2a25;
+    --color-panel-ink: #dff1ec;
+    --color-panel-card: #11392f;
+    --color-t-article: #5b93ea;
+    --color-t-video: #e2685e;
+    --color-t-podcast: #9a7be8;
+    --color-t-course: #bd8426;
+    --color-t-tool: #3dab78;
+    --color-t-custom: #8fa0b5;
+    --color-on-type: #0d1412;
+    --color-ok: #58c38f;
+    --color-warn: #e2ab4d;
+    --color-danger: #f17f75;
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-bg font-body text-ink m-0 text-[0.9375rem];
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-display m-0 tracking-[-0.015em] text-balance;
+  }
+  h1 {
+    @apply text-[clamp(1.5rem,2.4vw,1.9rem)] font-bold;
+  }
+  h2 {
+    @apply text-[1.05rem] font-bold;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      transition: none !important;
+      animation: none !important;
+    }
+  }
+}
+
+/* Shared control styles from the prototype's Bootstrap overrides. */
+@layer components {
+  .field {
+    @apply bg-surface border-line text-ink w-full rounded-[0.6rem] border px-3 py-1.5 placeholder:text-muted/80 focus:border-brand focus:ring-brand/20 focus:ring-[0.2rem] focus:outline-none;
+  }
+  .field-invalid {
+    @apply border-danger;
+  }
+  .label {
+    @apply mb-[0.35rem] block text-[0.85rem] font-semibold;
+  }
+  .meta {
+    @apply text-muted text-[0.82rem];
+  }
+  .linkish {
+    @apply text-brand cursor-pointer border-0 bg-transparent p-0 underline;
+  }
+  .btn-icon {
+    @apply text-muted hover:bg-surface-2 hover:text-ink relative inline-grid size-[34px] flex-none place-items-center rounded-[9px] border-0 bg-transparent;
+  }
+}
+
+@layer components {
+  .stamp {
+    @apply text-muted inline-flex items-center gap-1.5 font-mono text-[0.69rem] tracking-[0.05em] whitespace-nowrap uppercase tabular-nums;
+  }
+  .check {
+    @apply border-muted checked:bg-brand checked:border-brand size-4 rounded accent-(--color-brand);
+  }
+}
