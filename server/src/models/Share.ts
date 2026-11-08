@@ -21,5 +21,8 @@ const shareSchema = new Schema(
   { timestamps: true },
 );
 
+// One share per link and recipient, even when two requests race.
+shareSchema.index({ item: 1, kind: 1, toUser: 1, toGroup: 1 }, { unique: true });
+
 export type ShareDoc = HydratedDocument<InferSchemaType<typeof shareSchema>>;
 export const Share = model('Share', shareSchema);

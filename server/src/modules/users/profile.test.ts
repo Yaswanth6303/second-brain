@@ -41,6 +41,29 @@ describe('profile', () => {
     expect([168, 212, 262, 330, 12, 38]).toContain(hue);
   });
 
+  it('asks for the current password to change the email', async () => {
+    const a = await signUp(alice);
+    const none = await a.agent.patch('/api/users/me').send({ email: 'new@example.com' });
+    expect(none.status).toBe(400);
+    expect(none.body.error.fields.currentPassword).toBe(
+      'Enter your current password to change your email.',
+    );
+    const wrong = await a.agent
+      .patch('/api/users/me')
+      .send({ email: 'new@example.com', currentPassword: 'nope-nope' });
+    expect(wrong.status).toBe(400);
+    expect(wrong.body.error.fields.currentPassword).toBe('That password is not right.');
+    const ok = await a.agent
+      .patch('/api/users/me')
+      .send({ email: 'new@example.com', currentPassword: alice.password });
+    expect(ok.body.user.email).toBe('new@example.com');
+    // Sending the same email back is not a change and needs no password.
+    await a.agent
+      .patch('/api/users/me')
+      .send({ name: 'Alice', email: 'NEW@example.com' })
+      .expect(200);
+  });
+
   it('saves settings', async () => {
     const a = await signUp(alice);
     const res = await a.agent

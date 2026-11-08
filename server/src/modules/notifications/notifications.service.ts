@@ -22,13 +22,16 @@ export async function listNotifications(me: string) {
       'requester',
       'name',
     ),
-    listEntries(me, { state: 'new' }),
-    sentShares(me),
+    listEntries(me, { state: 'new' }, 10),
+    // Only shares something happened to can produce a notification.
+    sentShares(me, { $or: [{ seen: { $ne: 'new' } }, { 'done.0': { $exists: true } }] }, 20),
     Item.find({
       owner: me,
       status: { $ne: 'done' },
       remindAt: { $ne: null, $lte: new Date(now.getTime() + WEEK) },
-    }),
+    })
+      .sort({ remindAt: 1 })
+      .limit(10),
   ]);
 
   const items: Note[] = [

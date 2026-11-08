@@ -392,6 +392,7 @@ export async function seed() {
     const user = await signup({ name: p.name, handle, email: p.email, password: DEMO_PASSWORD });
     user.set({ hue: p.hue, bio: p.bio });
     await user.save();
+    await backdate(User as never, user.id, ago(670));
     ids[handle] = user.id as string;
   }
   const me = ids.aarav;
@@ -406,11 +407,12 @@ export async function seed() {
     });
     await backdate(Friendship as never, f.id, ago(d));
   };
-  await friend('aarav', 'priyan', 300);
-  await friend('aarav', 'rohanv', 240);
-  await friend('sneha.i', 'aarav', 150);
-  await friend('aarav', 'kabirs', 30);
+  await friend('aarav', 'priyan', 660);
+  await friend('aarav', 'rohanv', 600);
+  await friend('sneha.i', 'aarav', 510);
+  await friend('aarav', 'kabirs', 360);
   await friend('meeraj', 'aarav', 270);
+  // Friends of friends, for group members who are not Aarav's friends.
   await friend('rohanv', 'sneha.i', 100);
   await friend('rohanv', 'meeraj', 100);
   await friend('devm', 'aarav', 0, false);

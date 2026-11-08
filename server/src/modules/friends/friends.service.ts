@@ -1,4 +1,4 @@
-import { isValidObjectId } from 'mongoose';
+import { Types, isValidObjectId } from 'mongoose';
 import { HttpError } from '../../lib/http-error.ts';
 import { Friendship, pairKey } from '../../models/Friendship.ts';
 import { InboxEntry } from '../../models/InboxEntry.ts';
@@ -78,22 +78,45 @@ export async function listFriends(me: string) {
   const them = (f: (typeof rows)[number]) =>
     toPerson(String(f.requester.id) === me ? f.recipient : f.requester);
 
-  const friends = await Promise.all(
-    rows
-      .filter((f) => f.status === 'accepted')
-      .map(async (f) => {
-        const user = them(f);
-        const [sent, done, received] = await Promise.all([
-          Share.countDocuments({ from: me, kind: 'friend', toUser: user.id }),
-          Share.countDocuments({ from: me, kind: 'friend', toUser: user.id, seen: 'done' }),
-          InboxEntry.countDocuments({ recipient: me, from: user.id, state: { $ne: 'dismissed' } }),
-        ]);
-        return { user, since: f.acceptedAt ?? f.createdAt, sent, done, received };
-      }),
-  );
+  // Two grouped queries for every friend's counts, instead of three queries per friend.
+  const meId = new Types.ObjectId(me);
+  const [sentAgg, receivedAgg] = await Promise.all([
+    Share.aggregate<{ user: unknown; sent: number; done: number }>([
+      { $match: { from: meId, kind: 'friend' } },
+      {
+        $group: {
+          _id: '$toUser',
+          sent: { $sum: 1 },
+          done: { $sum: { $cond: [{ $eq: ['$seen', 'done'] }, 1, 0] } },
+        },
+      },
+      { $project: { _id: 0, user: '$_id', sent: 1, done: 1 } },
+    ]),
+    InboxEntry.aggregate<{ user: unknown; n: number }>([
+      { $match: { recipient: meId, state: { $ne: 'dismissed' } } },
+      { $group: { _id: '$from', n: { $sum: 1 } } },
+      { $project: { _id: 0, user: '$_id', n: 1 } },
+    ]),
+  ]);
+  const sentBy = new Map(sentAgg.map((r) => [String(r.user), r]));
+  const receivedBy = new Map(receivedAgg.map((r) => [String(r.user), r.n]));
+  const friends = rows
+    .filter((f) => f.status === 'accepted')
+    .map((f) => {
+      const user = them(f);
+      const s = sentBy.get(user.id);
+      return {
+        user,
+        since: f.acceptedAt ?? f.createdAt,
+        sent: s?.sent ?? 0,
+        done: s?.done ?? 0,
+        received: receivedBy.get(user.id) ?? 0,
+      };
+    });
   const pending = rows.filter((f) => f.status === 'pending');
   return {
-    friends,
+    // Oldest friendship first, like the prototype's list.
+    friends: friends.toSorted((a, b) => +a.since - +b.since),
     requests: pending
       .filter((f) => String(f.recipient.id) === me)
       .map((f) => ({ id: f.id as string, user: them(f) })),

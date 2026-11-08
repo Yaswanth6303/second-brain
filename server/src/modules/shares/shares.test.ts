@@ -88,6 +88,16 @@ describe('sharing', () => {
     expect(await Share.countDocuments()).toBe(1);
   });
 
+  it('two identical requests at the same moment still make one share', async () => {
+    const { a, b, item } = await setup();
+    await makeFriends(a, b);
+    const send = () => a.agent.post('/api/shares').send({ itemIds: [item], friends: [b.id] });
+    const results = await Promise.all([send(), send(), send()]);
+    expect(results.map((r) => r.status)).toEqual([201, 201, 201]);
+    expect(await Share.countDocuments()).toBe(1);
+    expect(await inboxOf(b.id)).toHaveLength(1);
+  });
+
   it("can't share someone else's link", async () => {
     const { a, b, item } = await setup();
     await makeFriends(a, b);

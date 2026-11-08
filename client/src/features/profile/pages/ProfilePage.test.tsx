@@ -108,4 +108,36 @@ describe("ProfilePage", () => {
     await user.click(await screen.findByRole("button", { name: "Save profile" }));
     expect(await screen.findByText("Check the highlighted fields.")).toBeInTheDocument();
   });
+
+  it("shows the saved, cleaned-up values after saving", async () => {
+    const { user } = setup("/profile/settings");
+    server.use(
+      http.patch("/api/users/me", () => HttpResponse.json({ user: { ...me, handle: "aarav.m" } })),
+    );
+    const handle = await screen.findByLabelText("Username");
+    await user.clear(handle);
+    await user.type(handle, "Aarav.M");
+    await user.click(screen.getByRole("button", { name: "Save profile" }));
+    expect(await screen.findByText("Profile saved")).toBeInTheDocument();
+    expect(handle).toHaveValue("aarav.m");
+  });
+
+  it("asks for the current password when the email changes", async () => {
+    const { user } = setup("/profile/settings");
+    let body: Record<string, unknown> = {};
+    server.use(
+      http.patch("/api/users/me", async ({ request }) => {
+        body = (await request.json()) as Record<string, unknown>;
+        return HttpResponse.json({ user: { ...me, email: "new@example.com" } });
+      }),
+    );
+    expect(screen.queryByLabelText("Current password")).not.toBeInTheDocument();
+    const email = await screen.findByLabelText("Email");
+    await user.clear(email);
+    await user.type(email, "new@example.com");
+    await user.type(await screen.findByLabelText("Current password"), "Secret123!");
+    await user.click(screen.getByRole("button", { name: "Save profile" }));
+    expect(await screen.findByText("Profile saved")).toBeInTheDocument();
+    expect(body).toMatchObject({ email: "new@example.com", currentPassword: "Secret123!" });
+  });
 });

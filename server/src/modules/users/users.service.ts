@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt';
 import { HttpError } from '../../lib/http-error.ts';
 import { BUILTIN_LABELS, TYPE_ICONS } from '../../lib/types.ts';
 import { Item } from '../../models/Item.ts';
@@ -83,8 +84,21 @@ export async function setShelf(userId: string, ids: string[]) {
 }
 
 // A duplicate handle or email fails the save as a whole (409 from the error handler).
-export async function updateProfile(userId: string, patch: ProfileInput) {
+export async function updateProfile(userId: string, { currentPassword, ...patch }: ProfileInput) {
   const user = await load(userId);
+  // A changed email could be used to reset the password, so it needs the current one.
+  if (patch.email && patch.email !== user.email) {
+    if (!currentPassword) {
+      throw new HttpError(400, 'Enter your current password to change your email.', {
+        currentPassword: 'Enter your current password to change your email.',
+      });
+    }
+    if (!(await bcrypt.compare(currentPassword, user.passwordHash))) {
+      throw new HttpError(400, 'That password is not right.', {
+        currentPassword: 'That password is not right.',
+      });
+    }
+  }
   user.set(patch);
   return user.save();
 }

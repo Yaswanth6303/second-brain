@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { Friendship } from '../../models/Friendship.ts';
 import { alice, bob, carol, link, makeFriends, signUp } from '../../test/helpers.ts';
 
 describe('friend requests', () => {
@@ -74,6 +75,25 @@ describe('friend requests', () => {
       }),
     ]);
     expect(friends[0].since).toBeTypeOf('string');
+  });
+});
+
+describe('friend list order', () => {
+  it('lists the oldest friendship first, as the prototype does', async () => {
+    const a = await signUp(alice);
+    const b = await signUp(bob);
+    const c = await signUp(carol);
+    // Bob is added first and Carol last, so newest-first would put Carol on top.
+    await makeFriends(a, b);
+    await makeFriends(a, c);
+    await Friendship.updateOne(
+      { requester: a.id, recipient: b.id },
+      { acceptedAt: new Date('2025-01-01') },
+    );
+    const names = (await a.agent.get('/api/friends')).body.friends.map(
+      (f: { user: { handle: string } }) => f.user.handle,
+    );
+    expect(names).toEqual(['bob', 'carol']);
   });
 });
 

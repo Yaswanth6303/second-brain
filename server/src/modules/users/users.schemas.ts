@@ -30,6 +30,8 @@ export const profileSchema = z
     bio: z.string().trim().max(140),
     // Any hue is valid: older accounts may hold a colour outside today's six swatches.
     hue: z.number().int().min(0).max(359),
+    // Needed only when the email changes.
+    currentPassword: z.string(),
   })
   .partial();
 

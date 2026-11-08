@@ -31,18 +31,18 @@ function Switch({
   const id = useId();
   return (
     <div>
-      <label htmlFor={id} className="flex items-center gap-2">
+      <label htmlFor={id} className="flex items-center gap-2.5">
         <input
           id={id}
           type="checkbox"
           role="switch"
-          className="check"
+          className="switch text-base"
           checked={checked}
           onChange={(e) => onChange(e.target.checked)}
         />
         {label}
       </label>
-      <div className="text-muted text-[.875em]">{help}</div>
+      <div className="text-muted pl-[2.625rem] text-[.875em]">{help}</div>
     </div>
   );
 }
@@ -65,19 +65,26 @@ export function Settings({ onChooseShelf }: { onChooseShelf: () => void }) {
     bio: user!.bio,
     hue: user!.hue,
   });
+  const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<Record<string, string | undefined>>({});
   const [deleting, setDeleting] = useState(false);
+  // A new email can be used to reset the password, so the server asks for the current one.
+  const emailChanged = form.email.trim().toLowerCase() !== user!.email;
   const set = (p: Partial<typeof form>) => setForm((f) => ({ ...f, ...p }));
 
   async function saveProfile() {
     try {
-      setUser(await updateProfile(form));
+      const u = await updateProfile(emailChanged ? { ...form, currentPassword: password } : form);
+      setUser(u);
+      // Show what the server stored (e.g. a lowercased username), not what was typed.
+      setForm({ name: u.name, handle: u.handle, email: u.email, bio: u.bio, hue: u.hue });
+      setPassword("");
       setErrors({});
       toast("Profile saved");
     } catch (e) {
       if (!(e instanceof ApiError)) return setErrors({ form: "Could not save. Try again." });
       // Field errors show under their field; anything else needs the message, or nothing would appear.
-      const shown = ["name", "handle", "email"];
+      const shown = ["name", "handle", "email", "currentPassword"];
       const fields = e.fields ?? {};
       setErrors(Object.keys(fields).some((k) => shown.includes(k)) ? fields : { form: e.message });
     }
@@ -131,6 +138,17 @@ export function Settings({ onChooseShelf }: { onChooseShelf: () => void }) {
             error={errors.email}
             onChange={(e) => set({ email: e.target.value })}
           />
+          {emailChanged && (
+            <Field
+              label="Current password"
+              type="password"
+              autoComplete="current-password"
+              hint="Needed to change your email."
+              value={password}
+              error={errors.currentPassword}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          )}
           <div>
             <label className="label" htmlFor={bioId}>
               Bio

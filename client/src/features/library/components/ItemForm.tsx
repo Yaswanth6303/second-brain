@@ -8,6 +8,7 @@ import { bare, detectType, guessTitle, normUrl } from "../../../lib/url.ts";
 import { useQueryClient } from "@tanstack/react-query";
 import { refreshSocial } from "../../../lib/social-cache.ts";
 import { useAuth } from "../../auth/index.ts";
+import { type Person, useFriends } from "../../friends/index.ts";
 import { ShareTargets, applyShareDiff, useSentSharesQuery } from "../../shares/index.ts";
 import { useItemMutations } from "../hooks/useItemMutations.ts";
 import { useItems } from "../hooks/useItems.ts";
@@ -33,8 +34,16 @@ export function ItemForm({ item, preUrl = "", defaultColl = "", onClose, onSaved
   const m = useItemMutations();
   const toast = useToast();
   const qc = useQueryClient();
+  // Set once a new link is saved, so a retry (say, after sharing failed) updates it instead of saving it twice.
+  const [created, setCreated] = useState<Item | null>(null);
+  const target = item ?? created;
   const sent = useSentSharesQuery();
-  const current = sent.shares.filter((s) => !!item && s.item === item.id);
+  const current = sent.shares.filter((s) => !!target && s.item === target.id);
+  // People shared with by username aren't friends, so list them too or they could not be unticked here.
+  const friendIds = new Set(useFriends().friends.map((x) => x.user.id));
+  const extraPeople = current
+    .filter((s) => s.kind === "friend" && !friendIds.has(s.to.id))
+    .map((s) => s.to as Person);
   // null until the user changes a tick: until then the item's sharing is left exactly as it is.
   const [edited, setTargets] = useState<{ friends: string[]; groups: string[] } | null>(null);
   const targets = edited ?? {
@@ -97,7 +106,8 @@ export function ItemForm({ item, preUrl = "", defaultColl = "", onClose, onSaved
         remindAt: fromLocalInput(f.remind),
         tags: addTags(tags, draft),
       };
-      const saved = item ? await m.update(item.id, data) : await m.create(data);
+      const saved = target ? await m.update(target.id, data) : await m.create(data);
+      if (!target) setCreated(saved);
       const shelf = user!.shelf.filter((id) => id !== saved.id);
       if (f.shelf !== onShelf) await m.setShelf(f.shelf ? [...shelf, saved.id] : shelf);
       const n = edited
@@ -286,18 +296,18 @@ export function ItemForm({ item, preUrl = "", defaultColl = "", onClose, onSaved
           />
         </div>
         <div>
-          <label className="flex items-center gap-2" htmlFor={ids.shelf}>
+          <label className="flex items-center gap-2.5" htmlFor={ids.shelf}>
             <input
               id={ids.shelf}
               type="checkbox"
               role="switch"
-              className="check"
+              className="switch text-base"
               checked={f.shelf}
               onChange={(e) => set({ shelf: e.target.checked })}
             />
             Show on my shelf
           </label>
-          <div className="text-muted text-[0.875em]">
+          <div className="text-muted pl-[2.625rem] text-[0.875em]">
             Friends can see links on your shelf. Everything else stays private.
           </div>
         </div>
@@ -315,7 +325,12 @@ export function ItemForm({ item, preUrl = "", defaultColl = "", onClose, onSaved
           <div className="text-muted mt-1 text-[0.875em]">Leave empty for no reminder.</div>
         </div>
         {sent.ready ? (
-          <ShareTargets legend="Put it on a watchlist" {...targets} onChange={setTargets} />
+          <ShareTargets
+            legend="Put it on a watchlist"
+            {...targets}
+            extraPeople={extraPeople}
+            onChange={setTargets}
+          />
         ) : (
           <p className="meta m-0">Loading watchlists…</p>
         )}

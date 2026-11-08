@@ -75,7 +75,7 @@ export function SharedWith() {
   const cell = "border-line border-t px-2 py-2.5 align-middle";
   return (
     <>
-      <p className="meta">Everyone who can see links you shared, and how far they got.</p>
+      <p className="meta mb-4">Everyone who can see links you shared, and how far they got.</p>
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-left">
           <thead>

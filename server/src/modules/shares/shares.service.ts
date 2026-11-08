@@ -29,6 +29,17 @@ export async function memberGroup(me: string, id: string): Promise<GroupDoc> {
   return g;
 }
 
+// Creates the share unless this link already went to that recipient. The unique index
+// makes this safe when two requests race; the loser just gets null.
+async function createOnce(doc: Record<string, unknown>): Promise<ShareDoc | null> {
+  try {
+    return await Share.create(doc);
+  } catch (e) {
+    if ((e as { code?: number }).code === 11000) return null;
+    throw e;
+  }
+}
+
 export async function createShares(me: string, input: CreateSharesInput): Promise<ShareDoc[]> {
   const items = await Item.find({ _id: { $in: input.itemIds }, owner: me });
   if (items.length !== new Set(input.itemIds).size) throw new HttpError(404, 'Link not found.');
@@ -61,14 +72,14 @@ export async function createShares(me: string, input: CreateSharesInput): Promis
       msg: input.msg,
     };
     for (const user of people) {
-      if (await Share.exists({ item: item.id, kind: 'friend', toUser: user.id })) continue;
-      const share = await Share.create({ ...copy, kind: 'friend', toUser: user.id });
+      const share = await createOnce({ ...copy, kind: 'friend', toUser: user.id });
+      if (!share) continue;
       await InboxEntry.create({ recipient: user.id, share: share.id, from: me });
       created.push(share);
     }
     for (const g of groups) {
-      if (await Share.exists({ item: item.id, kind: 'group', toGroup: g.id })) continue;
-      const share = await Share.create({ ...copy, kind: 'group', toGroup: g.id });
+      const share = await createOnce({ ...copy, kind: 'group', toGroup: g.id });
+      if (!share) continue;
       const others = g.members.map(String).filter((m) => m !== me);
       await InboxEntry.insertMany(
         others.map((recipient) => ({ recipient, share: share.id, from: me })),
@@ -79,9 +90,10 @@ export async function createShares(me: string, input: CreateSharesInput): Promis
   return created;
 }
 
-export async function sentShares(me: string) {
-  const shares = await Share.find({ from: me })
+export async function sentShares(me: string, filter: Record<string, unknown> = {}, limit = 0) {
+  const shares = await Share.find({ from: me, ...filter })
     .sort({ createdAt: -1 })
+    .limit(limit)
     .populate<{ toUser: UserDoc | null }>('toUser', 'name handle bio hue')
     .populate<{ toGroup: GroupDoc | null }>('toGroup', 'name')
     .populate<{ done: { user: UserDoc | null; at: Date }[] }>('done.user', 'name handle bio hue');

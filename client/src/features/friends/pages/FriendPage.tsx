@@ -173,7 +173,7 @@ export function FriendPage() {
       {tab === "out" &&
         (watchlist.length ? (
           <>
-            <p className="meta">
+            <p className="meta mb-4">
               {first} finished {done} of {plural(watchlist.length, "link")} you picked.
             </p>
             <ul className={list}>

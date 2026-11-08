@@ -143,6 +143,67 @@ describe("ItemForm", () => {
     void posted;
   });
 
+  it("lists people the link was shared with by username, so they can be unticked", async () => {
+    const { user } = setup();
+    const zed = { id: "z1", name: "Zed Stranger", handle: "zed", bio: "", hue: 300 };
+    server.use(
+      http.get("/api/shares/sent", () =>
+        HttpResponse.json({
+          shares: [
+            {
+              id: "s9",
+              item: "i1",
+              title: "Old title",
+              kind: "friend",
+              to: zed,
+              seen: "new",
+              seenAt: null,
+              done: [],
+              react: "",
+              at: "2026-11-01",
+            },
+          ],
+        }),
+      ),
+    );
+    await user.click(await screen.findByText("edit"));
+    expect(await screen.findByRole("checkbox", { name: /Zed Stranger/ })).toBeChecked();
+  });
+
+  it("retrying after a failed share updates the link instead of saving it twice", async () => {
+    const { user, posted } = setup("https://example.com/great-work-essay");
+    let shareCalls = 0;
+    const patched: string[] = [];
+    server.use(
+      http.get("/api/friends", () =>
+        HttpResponse.json({
+          friends: [{ user: priya, since: "2026-01-01", sent: 0, done: 0, received: 0 }],
+          requests: [],
+          sent: [],
+        }),
+      ),
+      http.post("/api/shares", () =>
+        ++shareCalls === 1
+          ? HttpResponse.json({ error: { message: "Try again" } }, { status: 500 })
+          : HttpResponse.json({ shares: [] }, { status: 201 }),
+      ),
+      http.patch("/api/items/:id", async ({ params, request }) => {
+        patched.push(String(params.id));
+        return HttpResponse.json({
+          item: mkItem(String(params.id), (await request.json()) as object),
+        });
+      }),
+    );
+    await user.click(await screen.findByText("new"));
+    await user.click(await screen.findByRole("checkbox", { name: /Priya Nair/ }));
+    await user.click(screen.getByRole("button", { name: "Save to library" }));
+    expect(await screen.findByText("Try again")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Save to library" }));
+    expect(await screen.findByText("Saved and added to 1 watchlist")).toBeInTheDocument();
+    expect(posted.filter((p) => "item" in (p as object))).toHaveLength(1);
+    expect(patched).toEqual(["new"]);
+  });
+
   it("deletes after confirming", async () => {
     let deleted = "";
     const { user } = setup();

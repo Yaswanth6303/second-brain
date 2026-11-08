@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { SideCard } from "../../../components/layout/RightRail.tsx";
 import { Button } from "../../../components/ui/Button.tsx";
 import { Tabs } from "../../../components/ui/Tabs.tsx";
 import { useToast } from "../../../components/ui/Toast.tsx";
@@ -146,12 +145,15 @@ export function ProfilePage() {
       {tab === "overview" && (
         <>
           <div className="mb-4">
-            <SideCard title="Your shelf">
+            <section className="bg-surface border-line flex flex-col gap-2.5 rounded-[14px] border p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="meta">
-                  {shelf.length} of {plural(items.length, "link")}. Friends see only these, in this
-                  order. Everything else stays private.
-                </span>
+                <div className="min-w-0">
+                  <h2>Your shelf</h2>
+                  <span className="meta">
+                    {shelf.length} of {plural(items.length, "link")}. Friends see only these, in
+                    this order. Everything else stays private.
+                  </span>
+                </div>
                 <Button size="sm" onClick={() => setEditing(true)}>
                   <i className="bi bi-sliders" /> Choose what is on it
                 </Button>
@@ -163,7 +165,7 @@ export function ProfilePage() {
                   Your shelf is empty, so friends see no links. Add the ones you want to show.
                 </p>
               )}
-            </SideCard>
+            </section>
           </div>
           <div className="grid gap-4 lg:grid-cols-12">
             <div className="lg:col-span-6">

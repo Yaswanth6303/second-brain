@@ -11,6 +11,7 @@ Base URL: `/api` (the Vite dev server proxies it to `http://localhost:4000`). Bo
 | 403 | Not allowed: someone who takes no links, or a group action only the owner may do |
 | 404 | Not found **or not yours**. Other people's ids get the same answer, so they can't be probed. |
 | 409 | Username or email already taken (`fields.handle` / `fields.email`) |
+| 429 | Too many attempts: login (10 per 15 min per address and email), forgot (5 per 15 min per email), reset (10 per 15 min per address) |
 
 Shapes used below:
 - **User (self):** `{ id, name, handle, email, bio, hue, prefs: { who, status, pub, digest, dust }, createdAt, shelf: id[], collections: string[], customTypes: { key, label, plural, icon }[] }`
@@ -39,7 +40,7 @@ Shapes used below:
 | Endpoint | Body | Response |
 |---|---|---|
 | `GET /me` | — | `{ user }` |
-| `PATCH /me` | any of `{ name, handle, email, bio (≤ 140), hue (0–359; the app offers 168, 212, 262, 330, 12, 38) }` | `{ user }` · 409 on a taken handle or email (nothing saved) |
+| `PATCH /me` | any of `{ name, handle, email, bio (≤ 140), hue (0–359; the app offers 168, 212, 262, 330, 12, 38), currentPassword }` | `{ user }` · changing the email needs `currentPassword` (400 `fields.currentPassword` otherwise) · 409 on a taken handle or email (nothing saved) |
 | `PATCH /me/prefs` | any of `{ who: friends\|anyone\|nobody, status, pub, digest, dust }` | `{ user }` |
 | `GET /me/export` | — | `{ exportedAt, user, items }` |
 | `DELETE /me` | — | 204. Removes the account and everything that points at it, and clears the cookie. |
@@ -73,7 +74,7 @@ Shapes used below:
 
 | Endpoint | Body | Response |
 |---|---|---|
-| `POST /` | `{ itemIds, friends?, groups?, handles?, msg? (≤ 280) }` | 201 `{ shares }`. Skips targets that already have the link. Direct shares need a friendship or the recipient's `who: anyone`; `who: nobody` → 403. |
+| `POST /` | `{ itemIds, friends?, groups?, handles?, msg? (≤ 280) }` | 201 `{ shares }`. Skips targets that already have the link (a unique index keeps this true even for simultaneous requests). Direct shares need a friendship or the recipient's `who: anyone`; `who: nobody` → 403. |
 | `GET /sent` | — | `{ shares: [{ id, item, title, kind, to, seen, seenAt, done: [{ user, at }], react, at }] }` |
 | `DELETE /:id` | — | 204 (sender only); its inbox entries go too |
 | `POST /:id/save` | — | `{ item }`. Recipient or group member only. Saves once per URL, with tag `from-<name>` and the message as the note. |

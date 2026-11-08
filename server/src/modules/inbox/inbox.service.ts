@@ -9,9 +9,10 @@ import { tellsFriends } from '../shares/shares.service.ts';
 type PopulatedShare = Omit<ShareDoc, 'toGroup'> & { toGroup: GroupDoc | null };
 
 // Inbox rows for one user, newest first, without dismissed ones.
-export async function listEntries(userId: string, filter: Record<string, unknown> = {}) {
+export async function listEntries(userId: string, filter: Record<string, unknown> = {}, limit = 0) {
   const rows = await InboxEntry.find({ recipient: userId, state: { $ne: 'dismissed' }, ...filter })
     .sort({ createdAt: -1 })
+    .limit(limit)
     .populate<{ from: UserDoc }>('from', 'name handle bio hue')
     .populate<{ share: PopulatedShare }>({
       path: 'share',

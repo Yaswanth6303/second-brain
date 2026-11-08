@@ -3,7 +3,9 @@ import type { User } from "../../auth/index.ts";
 import type { Person } from "../../friends/index.ts";
 import type { ShelfLink } from "../../library/index.ts";
 
-export type ProfileInput = Partial<Pick<User, "name" | "handle" | "email" | "bio" | "hue">>;
+export type ProfileInput = Partial<Pick<User, "name" | "handle" | "email" | "bio" | "hue">> & {
+  currentPassword?: string;
+};
 export type Prefs = User["prefs"];
 
 export const updateProfile = (body: ProfileInput) =>
