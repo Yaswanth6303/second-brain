@@ -123,7 +123,7 @@ User
   prefs: { who: 'friends'|'anyone'|'nobody', status: bool, pub: bool, digest: bool, dust: bool }
   shelf: [ItemId]                 ordered; position = shelf order
   collections: [string]
-  customTypes: [{ key, label, plural, icon, color }]
+  customTypes: [{ key, label, plural, icon }]
   notificationsSeenAt?
   resetTokenHash?, resetExpires?
 
@@ -182,12 +182,12 @@ auth        POST /auth/signup* · /auth/login* · /auth/logout · /auth/forgot* 
 users       GET/PATCH /users/me · PATCH /users/me/prefs · DELETE /users/me
             GET  /users/me/stats · GET /users/me/export
             PUT  /users/me/shelf            (ordered item ids)
-            POST/DELETE /users/me/collections · POST /users/me/types
+            POST /users/me/collections · DELETE /users/me/collections/:name
+            POST /users/me/types
             GET  /users/:handle             (public card / friend shelf, permission-checked)
-items       GET  /items?type&status&tag&coll&q&fav&shelf&sort
+items       GET  /items                     (whole library; filtering, sorting, tag
+                                            counts and pick-for-me run on the client)
             POST /items · GET/PATCH/DELETE /items/:id
-            GET  /items/pick?budget=&exclude=
-            GET  /items/tags                (tag counts)
 friends     GET  /friends · GET /friends/requests · POST /friends/requests {handleOrEmail}
             POST /friends/requests/:id/accept · /decline · DELETE /friends/:userId
             GET  /friends/:userId           (watchlist out/in + shelf)

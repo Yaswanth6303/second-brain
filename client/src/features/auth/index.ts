@@ -1,4 +1,4 @@
-export { AuthProvider, useAuth } from "./AuthContext.tsx";
+export { AuthProvider, ME, useAuth } from "./AuthContext.tsx";
 export { GuestOnly, RequireAuth } from "./components/Guards.tsx";
 export { ForgotPage } from "./pages/ForgotPage.tsx";
 export { LoginPage } from "./pages/LoginPage.tsx";

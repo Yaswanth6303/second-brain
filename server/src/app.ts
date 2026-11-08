@@ -5,6 +5,8 @@ import morgan from 'morgan';
 import { env } from './config/env.ts';
 import { errorHandler, notFound } from './middleware/error.ts';
 import { authRouter } from './modules/auth/auth.routes.ts';
+import { itemsRouter } from './modules/items/items.routes.ts';
+import { usersRouter } from './modules/users/users.routes.ts';
 
 export function createApp(): Express {
   const app = express();
@@ -19,6 +21,8 @@ export function createApp(): Express {
   });
 
   app.use('/api/auth', authRouter);
+  app.use('/api/items', itemsRouter);
+  app.use('/api/users', usersRouter);
 
   app.use(notFound);
   app.use(errorHandler);

@@ -10,3 +10,12 @@ afterEach(() => {
   localStorage.clear();
 });
 afterAll(() => server.close());
+
+// jsdom has no showModal/close yet; enough of <dialog> for component tests.
+HTMLDialogElement.prototype.showModal = function (this: HTMLDialogElement) {
+  this.open = true;
+};
+HTMLDialogElement.prototype.close = function (this: HTMLDialogElement) {
+  this.open = false;
+  this.dispatchEvent(new Event("close"));
+};

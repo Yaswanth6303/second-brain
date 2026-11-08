@@ -152,3 +152,79 @@
     @apply border-muted checked:bg-brand checked:border-brand size-4 rounded accent-(--color-brand);
   }
 }
+
+@layer components {
+  .tag {
+    @apply text-muted bg-surface-2 inline-flex items-center gap-1 rounded-md border-0 px-2 py-0.5 text-[.76rem] font-medium;
+  }
+  button.tag:hover {
+    @apply text-ink;
+  }
+  .tag.on {
+    @apply bg-mark text-mark-ink;
+  }
+}
+
+/* Library pieces from the prototype. --tc is the link type's colour, --sc the status colour. */
+@layer components {
+  .pill {
+    @apply border-line bg-surface text-ink hover:bg-surface-2 inline-flex h-[34px] items-center gap-1.5 rounded-full border px-3 text-[.86rem] font-semibold whitespace-nowrap disabled:pointer-events-none disabled:opacity-45;
+  }
+  .pill.on {
+    @apply bg-ink text-bg border-ink;
+  }
+  .n {
+    @apply text-muted font-mono text-[.72rem] tabular-nums;
+  }
+  .pill.on .n {
+    @apply text-bg opacity-75;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-[9px] py-[3px] text-[.75rem] font-semibold whitespace-nowrap;
+    color: var(--tc, var(--color-muted));
+    background: color-mix(in srgb, var(--tc, var(--color-muted)) 14%, var(--color-surface));
+  }
+  .chip-icon {
+    @apply size-9 flex-none justify-center rounded-[10px] p-0 text-base;
+  }
+  .item-title {
+    @apply font-display text-ink text-[1.06rem] leading-[1.25] font-semibold [overflow-wrap:anywhere] no-underline;
+  }
+  a.item-title:hover {
+    @apply decoration-mark underline decoration-[3px] underline-offset-[3px];
+  }
+  .item-title.sm {
+    @apply text-[.98rem];
+  }
+  .note {
+    @apply text-muted m-0 text-[.86rem] leading-[1.45];
+  }
+  .status {
+    @apply border-line bg-surface inline-flex items-center gap-1.5 rounded-full border px-2.5 py-[3px] text-[.78rem] font-semibold whitespace-nowrap;
+    color: var(--sc, var(--color-muted));
+  }
+  button.status:hover {
+    @apply bg-surface-2;
+  }
+  .s-progress {
+    --sc: var(--color-warn);
+  }
+  .s-done {
+    --sc: var(--color-ok);
+  }
+  .btn-icon.bordered {
+    @apply border-line bg-surface border;
+  }
+  .btn-icon.is-fav {
+    @apply text-warn;
+  }
+  .btn-icon.is-shelf {
+    @apply text-brand;
+  }
+  .side-list {
+    @apply m-0 flex list-none flex-col gap-2.5 p-0 text-[.86rem];
+  }
+  .side-list li {
+    @apply flex min-w-0 items-start gap-2;
+  }
+}

@@ -40,7 +40,6 @@ const userSchema = new Schema(
         label: String,
         plural: String,
         icon: String,
-        color: String,
       },
     ],
     notificationsSeenAt: Date,
@@ -71,5 +70,20 @@ export function toPublicUser(u: UserDoc) {
       dust: u.prefs!.dust,
     },
     createdAt: u.createdAt,
+  };
+}
+
+// What the signed-in user sees about themselves (adds their library settings).
+export function toSelf(u: UserDoc) {
+  return {
+    ...toPublicUser(u),
+    shelf: u.shelf.map(String),
+    collections: u.collections,
+    customTypes: u.customTypes.map(({ key, label, plural, icon }) => ({
+      key,
+      label,
+      plural,
+      icon,
+    })),
   };
 }

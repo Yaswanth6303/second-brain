@@ -16,3 +16,16 @@ export async function signedInAgent(user = alice) {
   await agent.post('/api/auth/signup').send(user).expect(201);
   return agent;
 }
+
+export const bob = {
+  name: 'Bob Iyer',
+  handle: 'bob',
+  email: 'bob@example.com',
+  password: 'Secret123!',
+};
+
+export const link = {
+  url: 'https://www.youtube.com/watch?v=aircAruvnKk',
+  title: 'But what is a neural network?',
+  type: 'video',
+};

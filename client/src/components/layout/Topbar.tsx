@@ -1,7 +1,8 @@
 import { useEffect, useRef } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate, useSearchParams } from "react-router";
 import { useTheme } from "../../context/ThemeContext.tsx";
 import { useAuth } from "../../features/auth/index.ts";
+import { useItemForm } from "../../features/library/index.ts";
 import { Avatar } from "../ui/Avatar.tsx";
 import { Button } from "../ui/Button.tsx";
 import { Dropdown, MenuItem } from "../ui/Dropdown.tsx";
@@ -11,6 +12,17 @@ export function Topbar({ onMenu }: { onMenu: () => void }) {
   const { theme, toggle } = useTheme();
   const navigate = useNavigate();
   const search = useRef<HTMLInputElement>(null);
+  const form = useItemForm();
+  const { pathname } = useLocation();
+  const [sp] = useSearchParams();
+  const onLibrary = pathname === "/library";
+  // Search filters the library; typing elsewhere jumps to it, as in the prototype.
+  const onSearch = (q: string) => {
+    const next = new URLSearchParams(onLibrary ? sp : undefined);
+    if (q) next.set("q", q);
+    else next.delete("q");
+    void navigate({ pathname: "/library", search: next.toString() }, { replace: onLibrary });
+  };
 
   // "/" focuses search, as in the prototype.
   useEffect(() => {
@@ -37,6 +49,8 @@ export function Topbar({ onMenu }: { onMenu: () => void }) {
           type="search"
           placeholder="Search names, tags and notes"
           aria-label="Search your library"
+          value={onLibrary ? (sp.get("q") ?? "") : ""}
+          onChange={(e) => onSearch(e.target.value)}
           className="text-ink min-w-0 flex-1 border-0 bg-transparent py-2 outline-0"
         />
         <kbd className="bg-surface-2 text-muted hidden rounded-[5px] px-1.5 py-px font-mono text-[.72rem] md:inline">
@@ -44,8 +58,7 @@ export function Topbar({ onMenu }: { onMenu: () => void }) {
         </kbd>
       </div>
       <span className="hidden flex-1 md:block" />
-      {/* Saving links arrives in stage 2. */}
-      <Button disabled title="Coming in stage 2">
+      <Button onClick={() => form.openNew()}>
         <i className="bi bi-plus-lg" />
         <span className="hidden sm:inline">Add link</span>
       </Button>

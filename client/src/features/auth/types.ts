@@ -13,4 +13,7 @@ export type User = {
     dust: boolean;
   };
   createdAt: string;
+  shelf: string[];
+  collections: string[];
+  customTypes: { key: string; label: string; plural: string; icon: string }[];
 };

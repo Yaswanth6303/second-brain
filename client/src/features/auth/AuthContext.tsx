@@ -11,7 +11,7 @@ type Auth = {
 };
 
 const AuthContext = createContext<Auth | null>(null);
-const ME = ["me"];
+export const ME = ["me"];
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const qc = useQueryClient();
