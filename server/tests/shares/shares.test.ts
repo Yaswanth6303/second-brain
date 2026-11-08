@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { Group } from '../../models/Group.ts';
-import { InboxEntry } from '../../models/InboxEntry.ts';
-import { Share } from '../../models/Share.ts';
-import { User } from '../../models/User.ts';
-import { alice, bob, carol, link, makeFriends, signUp } from '../../test/helpers.ts';
+import { Group } from '../../src/models/Group.ts';
+import { InboxEntry } from '../../src/models/InboxEntry.ts';
+import { Share } from '../../src/models/Share.ts';
+import { User } from '../../src/models/User.ts';
+import { alice, bob, carol, link, makeFriends, signUp } from '../support/helpers.ts';
 
 async function setup() {
   const a = await signUp(alice);

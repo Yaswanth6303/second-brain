@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "bootstrap-icons/font/bootstrap-icons.css";
 
-/* Tokens copied from the prototype :root (second-brain-bootstrap.html). */
+/* Tokens copied from the original prototype's :root. */
 @theme static {
   --color-bg: #f1f4f2;
   --color-surface: #ffffff;

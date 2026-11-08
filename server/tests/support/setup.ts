@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 import { afterAll, beforeAll, beforeEach } from 'vitest';
-import { env } from '../config/env.ts';
-import { connectDb } from '../db/connect.ts';
-import { resetRateLimits } from '../middleware/rate-limit.ts';
+import { env } from '../../src/config/env.ts';
+import { connectDb } from '../../src/db/connect.ts';
+import { resetRateLimits } from '../../src/middleware/rate-limit.ts';
 
 beforeAll(async () => {
   await connectDb(env.MONGO_URI_TEST);

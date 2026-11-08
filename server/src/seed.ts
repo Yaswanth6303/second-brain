@@ -1,4 +1,4 @@
-// Demo data ported from second-brain-bootstrap.html. Run with `bun run seed`.
+// Demo data ported from the original prototype. Run with `bun run seed`.
 // Only the demo accounts below are replaced; every other account is left alone.
 import mongoose from 'mongoose';
 import { env } from './config/env.ts';

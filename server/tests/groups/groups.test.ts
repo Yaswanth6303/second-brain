@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { InboxEntry } from '../../models/InboxEntry.ts';
-import { Share } from '../../models/Share.ts';
-import { alice, bob, carol, link, makeFriends, signUp } from '../../test/helpers.ts';
+import { InboxEntry } from '../../src/models/InboxEntry.ts';
+import { Share } from '../../src/models/Share.ts';
+import { alice, bob, carol, link, makeFriends, signUp } from '../support/helpers.ts';
 
 // Alice is friends with Bob and Carol; Bob and Carol are not friends.
 async function people() {

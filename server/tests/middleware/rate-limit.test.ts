@@ -1,6 +1,6 @@
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
-import { alice, app } from '../test/helpers.ts';
+import { alice, app } from '../support/helpers.ts';
 
 describe('rate limits', () => {
   it('stops repeated login attempts for the same email', async () => {

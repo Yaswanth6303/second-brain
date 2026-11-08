@@ -1,7 +1,7 @@
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
-import { User } from '../../models/User.ts';
-import { alice, app, bob, link, signedInAgent } from '../../test/helpers.ts';
+import { User } from '../../src/models/User.ts';
+import { alice, app, bob, link, signedInAgent } from '../support/helpers.ts';
 
 describe('items API', () => {
   it('creates an item and lists it newest first', async () => {

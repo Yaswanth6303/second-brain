@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { bob, link, signedInAgent } from '../../test/helpers.ts';
+import { bob, link, signedInAgent } from '../support/helpers.ts';
 
 describe('users/me', () => {
   it('returns the private profile with shelf, collections and custom types', async () => {

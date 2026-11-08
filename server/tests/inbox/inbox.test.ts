@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { Group } from '../../models/Group.ts';
-import { Share } from '../../models/Share.ts';
-import { alice, bob, carol, link, makeFriends, signUp } from '../../test/helpers.ts';
+import { Group } from '../../src/models/Group.ts';
+import { Share } from '../../src/models/Share.ts';
+import { alice, bob, carol, link, makeFriends, signUp } from '../support/helpers.ts';
 
 // Alice shares one link with her friend Bob.
 async function shared(msg = 'Watch this') {

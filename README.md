@@ -16,7 +16,7 @@
 
 <p align="center">
   Save links worth coming back to, tag them, share them with friends and groups, and see who finished them.<br />
-  A MERN rebuild of the prototype <code>second-brain-bootstrap.html</code>.
+  A full-stack MERN app on Bun, with a real multi-user backend.
 </p>
 
 <p align="center">
@@ -30,8 +30,15 @@
 | Database                  | MongoDB 8 in a Podman container                                                  |
 | Client                    | React 19, Vite+ (`vp`), Tailwind CSS v4, React Router, TanStack Query            |
 | Tests                     | Vitest (Supertest on the server; Testing Library + MSW on the client)            |
+| Security                  | bcrypt hashes, JWT session cookie, Zod at every endpoint, login/reset rate limits |
 
-Design: [`docs/superpowers/specs/2026-10-24-second-brain-mern-design.md`](docs/superpowers/specs/2026-10-24-second-brain-mern-design.md)
+## Architecture
+
+A React app talks to an Express 5 API on Bun through the Vite+ dev proxy; the API stores everything in MongoDB running in Podman. Each server feature is a module of routes → controller → service → Mongoose model.
+
+- [Architecture](docs/architecture.md): system diagram and one request traced through the layers
+- [Data model](docs/er-diagram.md): ER diagram of the six collections and how deletes cascade
+- [API reference](docs/api.md): every endpoint
 
 ## Status
 
@@ -41,8 +48,11 @@ All four stages are done:
 - **Library:** save links from the capture bar or "Add link"; edit, delete, favourite, status and shelf; filter, search and sort in cards or rows; collections, custom types, tags, reminders, dust and pick for me.
 - **Social:** friends and requests; share links with friends, groups or a username; an inbox with opened/finished tracking and reactions; groups you can create, edit, leave or delete; a notifications bell and friend activity.
 - **Profile:** reader card, shelf editor and bookshelf drawing, "See it as a friend", charts (time by type, when you save, give and take, tags), who you shared with, settings (profile, card colour, who can send you links, privacy, reminders), export as JSON, delete account, and profile links at `/u/:handle`.
+- **Hardening:** rate limits on login and password reset, one share per link and person (enforced by the database), the current password to change your email, and screens checked against the prototype in light and dark mode.
 
 ## Setup
+
+You need [Bun](https://bun.sh) 1.4+, the [Vite+](https://viteplus.dev) CLI (`vp`) and [Podman](https://podman.io).
 
 1. Start MongoDB (Podman container `mongodb`, image `mongo:8`, port 27017):
 
@@ -77,21 +87,16 @@ Password reset links are printed in the API's console. No email is sent.
 cd server && bun run seed
 ```
 
-This creates the prototype's sample world: Aarav, his five friends, a pending friend request, 13 links, two groups, and shares with progress and reactions. Log in as **aarav@example.com** with password **demo-library-2026**. Running it again replaces only the demo accounts; other accounts are untouched.
+This creates the prototype's sample world: Aarav, his five friends, a pending friend request, 14 links, two groups, and shares with progress and reactions. Log in as **aarav@example.com** with password **demo-library-2026**. Running it again replaces only the demo accounts; other accounts are untouched.
 
 ## Test
 
 ```sh
-cd server && bun run test        # uses the second-brain-test database
-cd client && vp test && vp check # tests, then format + lint + typecheck
+cd server && bun run test        # 98 API tests in server/tests, against the second-brain-test database
+cd client && vp test && vp check # 72 tests next to the code (*.test.tsx), then format + lint + typecheck
 ```
 
-## Docs
-
-- [Architecture](docs/architecture.md): system diagram and one request through the layers
-- [Data model](docs/er-diagram.md): ER diagram and cascades
-- [API reference](docs/api.md): every endpoint
-- [Design](docs/superpowers/specs/2026-10-24-second-brain-mern-design.md) and the [build plans](docs/superpowers/plans/)
+Server checks: `bun run lint`, `bun run format:check`, `bunx tsc --noEmit`.
 
 ## Layout
 
@@ -99,12 +104,23 @@ cd client && vp test && vp check # tests, then format + lint + typecheck
 server/src/
   app.ts               Express app (exported for tests)
   config/ db/ lib/     env, Mongo connection, HttpError
-  middleware/          requireAuth, validate(zod), error handler
+  middleware/          requireAuth, validate (Zod), rate limits, error handler
   models/              Mongoose models
-  modules/<feature>/   routes → controller → service (+ schemas, tests)
+  modules/<feature>/   routes → controller → service (+ schemas)
+  seed.ts              demo data (bun run seed)
+server/tests/
+  support/             setup (test database) and helpers (sign up, make friends)
+  <feature>/           API tests per feature: auth, items, users, friends,
+                       shares, inbox, groups, notifications
+  middleware/          rate limits
+  app.test.ts          health, 404, validation, bad JSON
+  seed.test.ts         demo data is repeatable and safe
 client/src/
   app/                 App, router, providers
   features/<feature>/  api/ components/ hooks/ pages/ (+ index.ts public API)
   components/          layout (AppShell, Rail, Topbar) and ui primitives
-  context/ lib/ styles/ test/
+  context/ lib/ styles/
+  test/                setup, MSW server, fixtures (tests sit next to the code)
+docs/
+  architecture.md · er-diagram.md · api.md
 ```

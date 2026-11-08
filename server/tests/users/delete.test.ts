@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { Friendship } from '../../models/Friendship.ts';
-import { Group } from '../../models/Group.ts';
-import { InboxEntry } from '../../models/InboxEntry.ts';
-import { Item } from '../../models/Item.ts';
-import { Share } from '../../models/Share.ts';
-import { User } from '../../models/User.ts';
-import { alice, bob, carol, link, makeFriends, signUp } from '../../test/helpers.ts';
+import { Friendship } from '../../src/models/Friendship.ts';
+import { Group } from '../../src/models/Group.ts';
+import { InboxEntry } from '../../src/models/InboxEntry.ts';
+import { Item } from '../../src/models/Item.ts';
+import { Share } from '../../src/models/Share.ts';
+import { User } from '../../src/models/User.ts';
+import { alice, bob, carol, link, makeFriends, signUp } from '../support/helpers.ts';
 
 describe('DELETE /api/users/me', () => {
   it('removes the account and everything that points at it', async () => {

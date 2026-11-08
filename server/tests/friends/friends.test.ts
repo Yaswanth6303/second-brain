@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { Friendship } from '../../models/Friendship.ts';
-import { alice, bob, carol, link, makeFriends, signUp } from '../../test/helpers.ts';
+import { Friendship } from '../../src/models/Friendship.ts';
+import { alice, bob, carol, link, makeFriends, signUp } from '../support/helpers.ts';
 
 describe('friend requests', () => {
   it('sends by handle or email and shows on both sides', async () => {

@@ -1,6 +1,6 @@
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
-import { alice, app, signedInAgent } from '../../test/helpers.ts';
+import { alice, app, signedInAgent } from '../support/helpers.ts';
 
 const cookieOf = (res: request.Response) =>
   ([] as string[]).concat(res.headers['set-cookie'] ?? []).join(';');

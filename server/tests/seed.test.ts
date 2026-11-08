@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { Group } from './models/Group.ts';
-import { InboxEntry } from './models/InboxEntry.ts';
-import { Item } from './models/Item.ts';
-import { Share } from './models/Share.ts';
-import { User } from './models/User.ts';
-import { DEMO_HANDLES, seed } from './seed.ts';
-import { alice, signUp } from './test/helpers.ts';
+import { Group } from '../src/models/Group.ts';
+import { InboxEntry } from '../src/models/InboxEntry.ts';
+import { Item } from '../src/models/Item.ts';
+import { Share } from '../src/models/Share.ts';
+import { User } from '../src/models/User.ts';
+import { DEMO_HANDLES, seed } from '../src/seed.ts';
+import { alice, signUp } from './support/helpers.ts';
 
 const counts = async () => ({
   users: await User.countDocuments(),
@@ -40,9 +40,9 @@ describe('seed', () => {
 
   it('lets the demo user log in', async () => {
     await seed();
-    const { app } = await import('./test/helpers.ts');
+    const { app } = await import('./support/helpers.ts');
     const { default: request } = await import('supertest');
-    const { DEMO_PASSWORD } = await import('./seed.ts');
+    const { DEMO_PASSWORD } = await import('../src/seed.ts');
     await request(app)
       .post('/api/auth/login')
       .send({ email: 'aarav@example.com', password: DEMO_PASSWORD })

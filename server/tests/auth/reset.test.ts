@@ -1,8 +1,8 @@
 import request from 'supertest';
 import { describe, expect, it, vi } from 'vitest';
-import { User } from '../../models/User.ts';
-import { alice, app, signedInAgent } from '../../test/helpers.ts';
-import { requestReset } from './auth.service.ts';
+import { User } from '../../src/models/User.ts';
+import { alice, app, signedInAgent } from '../support/helpers.ts';
+import { requestReset } from '../../src/modules/auth/auth.service.ts';
 
 const EXPIRED = 'This reset link has expired. Ask for a new one.';
 

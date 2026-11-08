@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { Share } from '../../models/Share.ts';
-import { alice, bob, carol, link, makeFriends, signUp } from '../../test/helpers.ts';
+import { Share } from '../../src/models/Share.ts';
+import { alice, bob, carol, link, makeFriends, signUp } from '../support/helpers.ts';
 
 describe('profile', () => {
   it('saves name, handle, bio and card colour', async () => {

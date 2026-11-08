@@ -1,4 +1,4 @@
-// Link helpers ported from the prototype (second-brain-bootstrap.html).
+// Link helpers ported from the original prototype.
 
 export function normUrl(v: string): string | null {
   v = (v || "").trim();

@@ -67,8 +67,9 @@ sequenceDiagram
 | `config/env.ts` | Validated environment (Zod) |
 | `middleware/` | `requireAuth`, `validate`, `errorHandler`, cookies |
 | `models/` | `User`, `Item`, `Friendship`, `Share`, `InboxEntry`, `Group` |
-| `modules/<feature>/` | `*.routes.ts` → `*.controller.ts` → `*.service.ts` (+ `*.schemas.ts`, `*.test.ts`) for auth, users, items, friends, shares, inbox, groups, notifications |
+| `modules/<feature>/` | `*.routes.ts` → `*.controller.ts` → `*.service.ts` (+ `*.schemas.ts`) for auth, users, items, friends, shares, inbox, groups, notifications |
 | `seed.ts` | Demo data (`bun run seed`) |
+| `../tests/` | Vitest + Supertest suites by feature (`tests/<feature>/*.test.ts`), with `tests/support/` for the test-database setup and helpers |
 
 | Client `client/src/` | Purpose |
 |---|---|

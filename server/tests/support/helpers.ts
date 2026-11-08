@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { createApp } from '../app.ts';
+import { createApp } from '../../src/app.ts';
 
 export const app = createApp();
 

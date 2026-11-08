@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { alice, bob, link, makeFriends, signUp } from '../../test/helpers.ts';
+import { alice, bob, link, makeFriends, signUp } from '../support/helpers.ts';
 
 describe('notifications', () => {
   it('lists friend requests and new links, and clears the dot once seen', async () => {

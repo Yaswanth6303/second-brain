@@ -2,9 +2,9 @@ import express from 'express';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { createApp } from './app.ts';
-import { errorHandler } from './middleware/error.ts';
-import { validate } from './middleware/validate.ts';
+import { createApp } from '../src/app.ts';
+import { errorHandler } from '../src/middleware/error.ts';
+import { validate } from '../src/middleware/validate.ts';
 
 describe('app', () => {
   it('answers the health check', async () => {
