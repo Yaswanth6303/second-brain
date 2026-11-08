@@ -1,4 +1,5 @@
 import { type InferSchemaType, type HydratedDocument, Schema, Types, model } from 'mongoose';
+import { CARD_HUES } from '../lib/types.ts';
 
 const userSchema = new Schema(
   {
@@ -19,7 +20,7 @@ const userSchema = new Schema(
     },
     passwordHash: { type: String, required: true },
     bio: { type: String, default: '' },
-    hue: { type: Number, default: () => Math.floor(Math.random() * 360) },
+    hue: { type: Number, default: () => CARD_HUES[Math.floor(Math.random() * CARD_HUES.length)] },
     prefs: {
       who: {
         type: String,

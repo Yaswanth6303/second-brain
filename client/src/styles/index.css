@@ -275,3 +275,35 @@
     @apply bg-mark text-mark-ink border-mark hover:border-card-ink inline-flex items-center gap-1.5 rounded-[.5rem] border px-2 py-1 text-[.875rem] font-semibold;
   }
 }
+
+/* The shelf drawing: one spine per link, sized by length, filled by status. */
+@layer components {
+  .spine {
+    @apply bg-surface text-ink flex flex-col items-center gap-1.5 rounded-t-[5px] border-[1.5px] border-b-0 px-0 pt-2.5 pb-2 no-underline transition-transform duration-150 hover:-translate-y-1.5 focus-visible:-translate-y-1.5;
+    border-color: var(--tc);
+  }
+  .sp-progress {
+    background: color-mix(in srgb, var(--tc) 24%, var(--color-surface));
+  }
+  .sp-done {
+    background: var(--tc);
+    color: var(--color-on-type);
+  }
+  .sp-title {
+    @apply min-h-0 flex-1 overflow-hidden text-[.78rem] leading-[17px] font-semibold [writing-mode:vertical-rl];
+  }
+  .key {
+    @apply inline-block size-3 flex-none rounded-[3px] border-[1.5px];
+    border-color: var(--kc, var(--color-muted));
+  }
+  .key-done {
+    background: var(--kc, var(--color-muted));
+  }
+  .key-progress {
+    background: color-mix(in srgb, var(--kc, var(--color-muted)) 30%, var(--color-surface));
+  }
+  .key-type {
+    --kc: var(--tc);
+    background: var(--tc);
+  }
+}

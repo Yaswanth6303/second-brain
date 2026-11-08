@@ -12,7 +12,7 @@ import { FriendPage, FriendsPage } from "../features/friends/index.ts";
 import { GroupPage, GroupsPage } from "../features/groups/index.ts";
 import { InboxPage } from "../features/inbox/index.ts";
 import { LibraryPage } from "../features/library/index.ts";
-import { ProfilePage } from "../features/profile/index.ts";
+import { ProfilePage, PublicProfilePage } from "../features/profile/index.ts";
 
 export const routes: RouteObject[] = [
   {
@@ -37,6 +37,7 @@ export const routes: RouteObject[] = [
           { path: "/groups", element: <GroupsPage /> },
           { path: "/groups/:id", element: <GroupPage /> },
           { path: "/profile/:tab?", element: <ProfilePage /> },
+          { path: "/u/:handle", element: <PublicProfilePage /> },
           { path: "*", element: <Navigate to="/library" replace /> },
         ],
       },

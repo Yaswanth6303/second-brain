@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const email = z
+export const email = z
   .string()
   .trim()
   .toLowerCase()
@@ -10,6 +10,7 @@ const password = z.string().min(8, { error: 'Use at least 8 characters.' });
 export const handle = z
   .string()
   .trim()
+  .toLowerCase()
   .regex(/^[a-z0-9_.]{3,20}$/, {
     error: 'Use 3 to 20 lowercase letters, numbers, dots or underscores.',
   });

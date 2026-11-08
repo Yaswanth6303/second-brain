@@ -132,9 +132,6 @@ export async function friendPage(me: string, them: string) {
     Share.find({ from: me, kind: 'friend', toUser: them }).sort({ createdAt: -1 }),
     listEntries(me, { from: them }),
   ]);
-  const shelfItems = await Item.find({ _id: { $in: user!.shelf }, owner: them });
-  const byId = new Map(shelfItems.map((i) => [i.id as string, i]));
-  const showStatus = user!.prefs!.status;
   return {
     user: toPerson(user!),
     since: f!.acceptedAt ?? f!.createdAt,
@@ -146,19 +143,25 @@ export async function friendPage(me: string, them: string) {
       react: s.react,
     })),
     received,
-    // Only what they chose to show, in their order; status only if they allow it.
-    shelf: user!.shelf
-      .map((id) => byId.get(String(id)))
-      .filter((i) => !!i)
-      .map((i) => ({
-        id: i.id as string,
-        url: i.url,
-        title: i.title,
-        type: i.type,
-        mins: i.mins,
-        fav: i.fav,
-        savedAt: i.createdAt,
-        ...(showStatus ? { status: i.status } : {}),
-      })),
+    shelf: await shelfOf(user!),
   };
+}
+
+// Only the links someone chose to show, in their order, without notes or tags.
+export async function shelfOf(user: UserDoc) {
+  const items = await Item.find({ _id: { $in: user.shelf }, owner: user.id });
+  const byId = new Map(items.map((i) => [i.id as string, i]));
+  return user.shelf
+    .map((id) => byId.get(String(id)))
+    .filter((i) => !!i)
+    .map((i) => ({
+      id: i.id as string,
+      url: i.url,
+      title: i.title,
+      type: i.type,
+      mins: i.mins,
+      fav: i.fav,
+      status: i.status,
+      savedAt: i.createdAt,
+    }));
 }

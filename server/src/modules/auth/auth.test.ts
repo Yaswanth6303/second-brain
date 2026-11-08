@@ -43,6 +43,14 @@ describe('POST /api/auth/signup', () => {
     expect(res.body.error.fields.handle).toBe('Already taken.');
   });
 
+  it('lowercases the username instead of rejecting capitals', async () => {
+    const res = await request(app)
+      .post('/api/auth/signup')
+      .send({ ...alice, handle: 'Alice' });
+    expect(res.status).toBe(201);
+    expect(res.body.user.handle).toBe('alice');
+  });
+
   it('validates the handle format', async () => {
     const res = await request(app)
       .post('/api/auth/signup')

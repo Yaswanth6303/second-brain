@@ -24,7 +24,11 @@ export async function listNotifications(me: string) {
     ),
     listEntries(me, { state: 'new' }),
     sentShares(me),
-    Item.find({ owner: me, remindAt: { $ne: null, $lte: new Date(now.getTime() + WEEK) } }),
+    Item.find({
+      owner: me,
+      status: { $ne: 'done' },
+      remindAt: { $ne: null, $lte: new Date(now.getTime() + WEEK) },
+    }),
   ]);
 
   const items: Note[] = [

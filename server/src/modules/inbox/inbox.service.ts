@@ -4,6 +4,7 @@ import type { GroupDoc } from '../../models/Group.ts';
 import { InboxEntry } from '../../models/InboxEntry.ts';
 import { Share, type ShareDoc } from '../../models/Share.ts';
 import { type UserDoc, toPerson } from '../../models/User.ts';
+import { tellsFriends } from '../shares/shares.service.ts';
 
 type PopulatedShare = Omit<ShareDoc, 'toGroup'> & { toGroup: GroupDoc | null };
 
@@ -44,6 +45,7 @@ async function ownEntry(me: string, id: string) {
 // Following the link counts as "opened" for the sender (direct shares only).
 export async function openEntry(me: string, id: string) {
   const entry = await ownEntry(me, id);
+  if (!(await tellsFriends(me))) return;
   await Share.updateOne(
     { _id: entry.share, kind: 'friend', seen: 'new' },
     { seen: 'opened', seenAt: new Date() },

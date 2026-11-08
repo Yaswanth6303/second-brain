@@ -11,6 +11,11 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
     res.status(err.status).json({ error: { message: err.message, fields: err.fields } });
     return;
   }
+  // express.json() could not parse the body.
+  if (err?.type === 'entity.parse.failed') {
+    res.status(400).json({ error: { message: 'The request body is not valid JSON.' } });
+    return;
+  }
   if (err instanceof ZodError) {
     const fields: Record<string, string> = {};
     for (const issue of err.issues) fields[issue.path.join('.')] ??= issue.message;

@@ -13,6 +13,7 @@ import { bare, domain } from "../../../lib/url.ts";
 import { useAuth } from "../../auth/index.ts";
 import { InboxRow } from "../../inbox/index.ts";
 import {
+  Shelf,
   TypeIcon,
   dur,
   typeColor,
@@ -322,47 +323,61 @@ export function FriendPage() {
               </div>
             </div>
             {sorted.length ? (
-              <ul className={list}>
-                {sorted.map((i) => {
-                  const t = typeOf(defs, i.type);
-                  const meta = [
-                    domain(i.url),
-                    dur(i.mins, t),
-                    i.fav ? "favourite" : i.status === "done" ? "finished" : "",
-                    `added ${rel(i.savedAt)}`,
-                  ];
-                  return (
-                    <li key={i.id} style={typeColor(t)} className={row}>
-                      <TypeIcon t={t} />
-                      <div className="flex min-w-0 flex-[1_1_240px] flex-col gap-[3px]">
-                        <a
-                          className="item-title sm"
-                          href={i.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          {i.title}
-                        </a>
-                        <div className="meta">{meta.filter(Boolean).join(" · ")}</div>
-                      </div>
-                      {inLibrary(i.url) ? (
-                        <span className="status static s-done">
-                          <i className="bi bi-check-circle-fill" />
-                          In your library
-                        </span>
-                      ) : (
-                        <Button
-                          variant="outline-primary"
-                          size="sm"
-                          onClick={() => void saveFromShelf(i)}
-                        >
-                          <i className="bi bi-plus-lg" /> Save to library
-                        </Button>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
+              <>
+                <section className="bg-surface border-line mb-3 flex flex-col gap-2.5 rounded-[14px] border p-4">
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <h2>{first}'s shelf</h2>
+                    <span className="meta">
+                      {sorted.length < shelf.length
+                        ? `Showing ${sorted.length} of ${shelf.length}. `
+                        : ""}
+                      Only the links {first} chose to show.
+                    </span>
+                  </div>
+                  <Shelf items={sorted} defs={defs} />
+                </section>
+                <ul className={list}>
+                  {sorted.map((i) => {
+                    const t = typeOf(defs, i.type);
+                    const meta = [
+                      domain(i.url),
+                      dur(i.mins, t),
+                      i.fav ? "favourite" : i.status === "done" ? "finished" : "",
+                      `added ${rel(i.savedAt)}`,
+                    ];
+                    return (
+                      <li key={i.id} style={typeColor(t)} className={row}>
+                        <TypeIcon t={t} />
+                        <div className="flex min-w-0 flex-[1_1_240px] flex-col gap-[3px]">
+                          <a
+                            className="item-title sm"
+                            href={i.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {i.title}
+                          </a>
+                          <div className="meta">{meta.filter(Boolean).join(" · ")}</div>
+                        </div>
+                        {inLibrary(i.url) ? (
+                          <span className="status static s-done">
+                            <i className="bi bi-check-circle-fill" />
+                            In your library
+                          </span>
+                        ) : (
+                          <Button
+                            variant="outline-primary"
+                            size="sm"
+                            onClick={() => void saveFromShelf(i)}
+                          >
+                            <i className="bi bi-plus-lg" /> Save to library
+                          </Button>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </>
             ) : (
               <EmptyState
                 icon="bi-search"

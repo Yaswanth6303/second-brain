@@ -29,4 +29,13 @@ describe('app', () => {
     expect(res.status).toBe(400);
     expect(res.body.error.fields.n).toBeTypeOf('string');
   });
+
+  it('answers 400 for a body that is not valid JSON', async () => {
+    const res = await request(createApp())
+      .post('/api/auth/login')
+      .set('Content-Type', 'application/json')
+      .send('{"email":');
+    expect(res.status).toBe(400);
+    expect(res.body).toEqual({ error: { message: 'The request body is not valid JSON.' } });
+  });
 });

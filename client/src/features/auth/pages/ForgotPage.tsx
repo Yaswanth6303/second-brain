@@ -9,17 +9,21 @@ import { type Errors, apiErrors, forgotSchema, parseForm } from "../schemas.ts";
 export function ForgotPage() {
   const [errors, setErrors] = useState<Errors>({});
   const [sent, setSent] = useState(false);
+  const [busy, setBusy] = useState(false);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const { data, errors } = parseForm(forgotSchema, e.currentTarget);
     setErrors(errors);
-    if (!data) return;
+    if (!data || busy) return;
+    setBusy(true);
     try {
       await authApi.forgot(data.email);
       setSent(true);
     } catch (err) {
       setErrors(apiErrors(err));
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -41,7 +45,7 @@ export function ForgotPage() {
           </div>
         )}
         <FormAlert>{errors.form}</FormAlert>
-        <Button type="submit" size="lg">
+        <Button type="submit" size="lg" disabled={busy}>
           Send reset link
         </Button>
         <p className="meta mb-0 text-center">

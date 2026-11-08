@@ -19,3 +19,6 @@ export const TYPE_ICONS = [
   'bi-cart',
   'bi-bookmark',
 ];
+
+// The prototype's six card colours (HSL hues); new accounts start on one of them.
+export const CARD_HUES = [168, 212, 262, 330, 12, 38];

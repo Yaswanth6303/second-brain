@@ -185,7 +185,7 @@ users       GET/PATCH /users/me · PATCH /users/me/prefs · DELETE /users/me
             PUT  /users/me/shelf            (ordered item ids)
             POST /users/me/collections · DELETE /users/me/collections/:name
             POST /users/me/types
-            GET  /users/:handle             (public card / friend shelf, permission-checked)
+            GET  /users/:handle             (you, a friend, or prefs.pub; else 404; logged-in only)
 items       GET  /items                     (whole library; filtering, sorting, tag
                                             counts and pick-for-me run on the client)
             POST /items · GET/PATCH/DELETE /items/:id

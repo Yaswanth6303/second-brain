@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "bun --watch src/index.ts",
     "test": "bunx --bun vitest run",
+    "seed": "bun src/seed.ts",
     "start": "bun src/index.ts",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint",

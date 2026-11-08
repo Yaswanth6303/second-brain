@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { User } from '../../models/User.ts';
 import { alice, bob, carol, link, makeFriends, signUp } from '../../test/helpers.ts';
 
 describe('friend requests', () => {
@@ -94,7 +93,7 @@ describe('friend page', () => {
     });
   });
 
-  it('shows their shelf in order and hides status unless they allow it', async () => {
+  it('shows their shelf in order, with status and without private fields', async () => {
     const a = await signUp(alice);
     const b = await signUp(bob);
     await makeFriends(a, b);
@@ -103,14 +102,11 @@ describe('friend page', () => {
     await b.agent.patch(`/api/items/${one}`).send({ status: 'done' });
     await b.agent.put('/api/users/me/shelf').send({ ids: [two, one] });
 
-    let shelf = (await a.agent.get(`/api/friends/${b.id}`)).body.shelf;
+    const shelf = (await a.agent.get(`/api/friends/${b.id}`)).body.shelf;
     expect(shelf.map((i: { title: string }) => i.title)).toEqual(['Two', 'One']);
     expect(shelf[1].status).toBe('done');
     expect(shelf[0]).not.toHaveProperty('note');
-
-    await User.updateOne({ _id: b.id }, { 'prefs.status': false });
-    shelf = (await a.agent.get(`/api/friends/${b.id}`)).body.shelf;
-    expect(shelf[1]).not.toHaveProperty('status');
+    expect(shelf[0]).not.toHaveProperty('tags');
   });
 
   it('remove ends the friendship', async () => {

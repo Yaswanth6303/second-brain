@@ -46,4 +46,25 @@ describe("SignupPage", () => {
     expect(await screen.findByText("Already taken.")).toBeInTheDocument();
     expect(screen.getByLabelText("Username")).toHaveAttribute("aria-invalid", "true");
   });
+
+  it("accepts a username with capitals and sends it lowercased", async () => {
+    let body: Record<string, unknown> = {};
+    server.use(
+      unauthenticated,
+      http.post("/api/auth/signup", async ({ request }) => {
+        body = (await request.json()) as Record<string, unknown>;
+        return HttpResponse.json({ error: { message: "stop" } }, { status: 500 });
+      }),
+    );
+    renderApp("/signup");
+    const user = userEvent.setup();
+    await user.type(await screen.findByLabelText("Full name"), "Aarav Mehta");
+    await user.type(screen.getByLabelText("Username"), "Aarav");
+    await user.type(screen.getByLabelText("Email"), "aarav@example.com");
+    await user.type(screen.getByLabelText("Password"), "Secret123!");
+    await user.click(screen.getByLabelText("I agree to the terms and the privacy policy"));
+    await user.click(screen.getByRole("button", { name: "Create account" }));
+    expect(await screen.findByText("stop")).toBeInTheDocument();
+    expect(body.handle).toBe("aarav");
+  });
 });

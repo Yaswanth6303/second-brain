@@ -51,4 +51,15 @@ describe('notifications', () => {
     expect(kinds).toContain(`finished: Bob Iyer finished ${link.title} and left a note`);
     expect(kinds).toContain(`reminder: Reminder: ${link.title}`);
   });
+
+  it('stops reminding about links already finished', async () => {
+    const a = await signUp(alice);
+    const due = new Date(Date.now() - 60e3).toISOString();
+    const id = (await a.agent.post('/api/items').send({ ...link, remindAt: due })).body.item.id;
+    await a.agent.patch(`/api/items/${id}`).send({ status: 'done' });
+    const kinds = (await a.agent.get('/api/notifications')).body.items.map(
+      (i: { kind: string }) => i.kind,
+    );
+    expect(kinds).not.toContain('reminder');
+  });
 });

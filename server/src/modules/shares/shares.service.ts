@@ -115,6 +115,10 @@ export const shareJson = (s: ShareDoc) => ({
   at: s.createdAt,
 });
 
+// "Tell friends when I open their links" (prefs.status).
+export const tellsFriends = async (me: string) =>
+  (await User.findById(me, { prefs: 1 }))?.prefs?.status !== false;
+
 const isRecipient = async (me: string, s: ShareDoc) =>
   s.kind === 'friend'
     ? String(s.toUser) === me
@@ -154,7 +158,7 @@ export async function saveShare(me: string, id: string) {
 // Called when a saved shared link changes status: tells the sender how far I got.
 export async function recordProgress(me: string, shareId: unknown, status: string) {
   const share = await Share.findById(shareId);
-  if (!share || !(await isRecipient(me, share))) return;
+  if (!share || !(await isRecipient(me, share)) || !(await tellsFriends(me))) return;
   if (share.kind === 'friend') {
     if (status === 'done') share.set({ seen: 'done', seenAt: new Date() });
     else if (status === 'progress' && share.seen === 'new')

@@ -85,6 +85,9 @@ export function Topbar({ onMenu }: { onMenu: () => void }) {
             <MenuItem icon="bi-person" onClick={() => (close(), void navigate("/profile"))}>
               Profile
             </MenuItem>
+            <MenuItem icon="bi-share" onClick={() => (close(), void navigate("/profile/shared"))}>
+              Who I shared with
+            </MenuItem>
             <MenuItem icon="bi-gear" onClick={() => (close(), void navigate("/profile/settings"))}>
               Settings
             </MenuItem>

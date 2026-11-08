@@ -79,7 +79,7 @@ async function dropInbox(groupId: string, people: string[]) {
   await InboxEntry.deleteMany({ recipient: { $in: people }, share: { $in: shares } });
 }
 
-async function destroy(g: GroupDoc) {
+export async function destroy(g: GroupDoc) {
   const shares = await Share.find({ toGroup: g.id }).distinct('_id');
   await Promise.all([
     g.deleteOne(),

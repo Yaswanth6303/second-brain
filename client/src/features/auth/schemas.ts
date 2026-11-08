@@ -14,6 +14,7 @@ export const signupSchema = z.object({
   handle: z
     .string()
     .trim()
+    .toLowerCase()
     .regex(/^[a-z0-9_.]{3,20}$/, {
       error: "Use 3 to 20 lowercase letters, numbers, dots or underscores.",
     }),

@@ -1,8 +1,10 @@
 export { TypeIcon } from "./components/bits.tsx";
 export { ItemFormProvider, useItemForm } from "./components/ItemFormProvider.tsx";
+export { Shelf, type ShelfLink } from "./components/Shelf.tsx";
+export { ShelfEditor } from "./components/ShelfEditor.tsx";
 export { useItemMutations } from "./hooks/useItemMutations.ts";
 export { useItems } from "./hooks/useItems.ts";
 export { dur, metaLine, typeColor } from "./lib/display.ts";
-export { tagCounts } from "./lib/filter.ts";
+export { isDust, tagCounts } from "./lib/filter.ts";
 export { LibraryPage } from "./pages/LibraryPage.tsx";
-export { type Item, typeDefs, typeOf } from "./types.ts";
+export { BUILTIN_TYPES, type Item, STATUS, typeDefs, typeOf } from "./types.ts";
