@@ -13,6 +13,8 @@ export type Item = {
   coll: string;
   remindAt: string | null;
   savedAt: string;
+  // Set when saved from someone's share.
+  fromShare?: string | null;
 };
 
 export type ItemInput = Pick<

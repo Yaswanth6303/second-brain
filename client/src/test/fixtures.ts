@@ -29,3 +29,14 @@ export const mkItem = (id: string, o: Partial<Item> = {}): Item => ({
   savedAt: new Date().toISOString(),
   ...o,
 });
+
+export const person = (id: string, name: string, hue = 200) => ({
+  id,
+  name,
+  handle: name.split(" ")[0]!.toLowerCase(),
+  bio: "",
+  hue,
+});
+
+export const priya = person("p1", "Priya Nair", 12);
+export const rohan = person("r1", "Rohan Verma", 212);

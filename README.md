@@ -20,7 +20,7 @@
 </p>
 
 <p align="center">
-  <img alt="Build stage 2 of 4" src="https://shieldcn.dev/badge/stage-2_of_4-0E6A5B.svg?variant=secondary" />
+  <img alt="Build stage 3 of 4" src="https://shieldcn.dev/badge/stage-3_of_4-0E6A5B.svg?variant=secondary" />
 </p>
 
 | Layer                     | Tech                                                                             |
@@ -35,12 +35,13 @@ Design: [`docs/superpowers/specs/2026-10-24-second-brain-mern-design.md`](docs/s
 
 ## Status
 
-Stages 1–2 of 4 are done:
+Stages 1–3 of 4 are done:
 
 - **Auth:** sign up, log in, log out, forgot and reset password, app shell.
 - **Library:** save links from the capture bar or "Add link"; edit, delete, favourite, status and shelf; filter, search and sort in cards or rows; collections, custom types, tags, reminders, dust and pick for me.
+- **Social:** friends and requests; share links with friends, groups or a username; an inbox with opened/finished tracking and reactions; groups you can create, edit, leave or delete; a notifications bell and friend activity.
 
-Stages 3–4 (social, profile) are next.
+Stage 4 (profile, shelf and stats, docs) is next.
 
 ## Setup
 

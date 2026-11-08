@@ -4,6 +4,7 @@ import { Button } from "./Button.tsx";
 type Props = {
   title: string;
   submitLabel: string;
+  cancelLabel?: string;
   onClose: () => void;
   onSubmit: () => void | Promise<void>;
   danger?: boolean;
@@ -12,7 +13,16 @@ type Props = {
 };
 
 // Native <dialog>: the browser handles focus trapping, Esc and the backdrop.
-export function Modal({ title, submitLabel, onClose, onSubmit, danger, busy, children }: Props) {
+export function Modal({
+  title,
+  submitLabel,
+  cancelLabel = "Cancel",
+  onClose,
+  onSubmit,
+  danger,
+  busy,
+  children,
+}: Props) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   useEffect(() => ref.current?.showModal(), []);
@@ -40,7 +50,7 @@ export function Modal({ title, submitLabel, onClose, onSubmit, danger, busy, chi
         <div className="overflow-y-auto p-4">{children}</div>
         <div className="border-line flex justify-end gap-2 border-t px-4 py-3">
           <Button variant="outline" onClick={onClose}>
-            Cancel
+            {cancelLabel}
           </Button>
           <Button type="submit" variant={danger ? "danger" : "primary"} disabled={busy}>
             {submitLabel}

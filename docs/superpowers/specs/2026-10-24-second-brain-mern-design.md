@@ -135,8 +135,8 @@ Item                               (one user's saved link)
   index: { owner, createdAt }, { owner, tags }, text index on title/note/url/tags
 
 Friendship
-  _id, requester → User, recipient → User, status: 'pending'|'accepted', createdAt
-  unique index on the unordered pair
+  _id, requester → User, recipient → User, status: 'pending'|'accepted', acceptedAt?,
+  pair (both ids sorted, unique), createdAt
 
 Group
   _id, owner → User, name, desc, members [User] (owner included), createdAt
@@ -144,14 +144,15 @@ Group
 Share                              (sender's view: "who did I give this to, did they finish")
   _id, item → Item, from → User, kind: 'friend'|'group',
   toUser? → User, toGroup? → Group, msg, createdAt
-  seen: 'new'|'opened'|'done'      (friend shares)
-  done: [User]                     (group shares: members who finished)
-  react?: string                   (recipient's reaction when finishing)
+  url, title, type, mins           (copy of the link, shown to recipients)
+  seen: 'new'|'opened'|'done', seenAt?   (friend shares)
+  done: [{ user, at }]             (group shares: members who finished, and when)
+  react: string                    (recipient's reaction when finishing)
 
 InboxEntry                         (recipient's view; one per recipient, fan-out for groups)
-  _id, recipient → User, share → Share, from → User, group? → Group,
-  url, title, type, mins, msg      (snapshot so it survives the sender deleting the item)
+  _id, recipient → User, share → Share, from → User,
   state: 'new'|'saved'|'dismissed', createdAt
+  (deleting the item deletes its shares and their inbox entries: it "leaves every watchlist")
 ```
 
 Rules from the prototype that the services enforce:
@@ -188,14 +189,14 @@ users       GET/PATCH /users/me · PATCH /users/me/prefs · DELETE /users/me
 items       GET  /items                     (whole library; filtering, sorting, tag
                                             counts and pick-for-me run on the client)
             POST /items · GET/PATCH/DELETE /items/:id
-friends     GET  /friends · GET /friends/requests · POST /friends/requests {handleOrEmail}
+friends     GET  /friends (friends, incoming requests, sent requests) · POST /friends/requests {who}
             POST /friends/requests/:id/accept · /decline · DELETE /friends/:userId
             GET  /friends/:userId           (watchlist out/in + shelf)
 groups      GET/POST /groups · GET/PATCH/DELETE /groups/:id · POST /groups/:id/leave
-shares      PUT  /items/:id/shares {friends:[ids], groups:[ids], handles:[str], msg}
-                                            (set exactly, like setShares)
-            DELETE /shares/:id · PATCH /shares/:id/react {react}   (recipient only)
-inbox       GET  /inbox · POST /inbox/:id/open · /save · /dismiss
+shares      POST /shares {itemIds, friends, groups, handles, msg}  (adds; skips existing)
+            GET  /shares/sent · DELETE /shares/:id (sender only)
+            POST /shares/:id/save (recipient or group member) · PATCH /shares/:id/react
+inbox       GET  /inbox · POST /inbox/:id/open · /dismiss
 notifications GET /notifications            (derived: due reminders, new inbox, requests)
             POST /notifications/seen
 ```
@@ -294,7 +295,8 @@ client/src/
   identical icons.
 - JWT in an httpOnly cookie rather than localStorage.
 - Notifications are **derived** on request, not stored.
-- Inbox entries **snapshot** link details so they survive the sender deleting the item.
+- Shares keep a copy of the link details; deleting the item removes its shares and inbox
+  entries (stage 3 plan R1–R3).
 - Tests run against the same Podman Mongo, in a separate `second-brain-test` database (`MONGO_URI_TEST`), dropped per test file (user decision: local Podman Mongo).
 - `prefs.who`: **friends** = only friends can share to you directly; **anyone** = any user
   can share to you by typing your username in the share modal (lands in your inbox like a

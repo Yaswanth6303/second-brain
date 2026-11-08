@@ -228,3 +228,50 @@
     @apply flex min-w-0 items-start gap-2;
   }
 }
+
+/* Social pieces from the prototype. */
+@layer components {
+  .status.static {
+    @apply border-transparent;
+    background: color-mix(in srgb, var(--sc, var(--color-muted)) 13%, var(--color-surface));
+  }
+  .av-stack {
+    @apply inline-flex pl-1.5;
+  }
+  .av-stack > * {
+    @apply -ml-1.5 shadow-[0_0_0_2px_var(--color-surface)];
+  }
+  .msg {
+    @apply bg-surface-2 mt-1.5 mb-0 max-w-[60ch] rounded-[4px_12px_12px_12px] px-3 py-2 text-[.88rem];
+  }
+  .react {
+    @apply text-ink flex gap-1.5 text-[.84rem];
+  }
+  .back {
+    @apply text-brand mb-3.5 inline-flex items-center gap-1.5 text-[.88rem] font-semibold no-underline;
+  }
+  .reader-card {
+    --card-bg: hsl(var(--h, 168) 40% 20%);
+    @apply text-card-ink mb-5 grid grid-cols-1 gap-x-8 gap-y-5 rounded-[18px] p-[clamp(18px,3vw,28px)] md:grid-cols-[minmax(0,1fr)_minmax(240px,300px)];
+    background: var(--card-bg);
+  }
+  .rc-slip {
+    @apply bg-card-line border-card-line m-0 grid grid-cols-2 gap-px self-start overflow-hidden rounded-[10px] border;
+  }
+  .rc-slip > div {
+    @apply flex flex-col gap-0.5 px-3.5 py-2.5;
+    background: var(--card-bg);
+  }
+  .rc-slip dt {
+    @apply text-card-dim font-mono text-[.66rem] font-medium tracking-[.08em] uppercase;
+  }
+  .rc-slip dd {
+    @apply font-display m-0 text-[1.45rem] leading-[1.15] font-bold;
+  }
+  .btn-card {
+    @apply text-card-ink border-card-line hover:bg-card-line hover:border-card-ink inline-flex items-center gap-1.5 rounded-[.5rem] border bg-transparent px-2 py-1 text-[.875rem] font-semibold;
+  }
+  .btn-mark {
+    @apply bg-mark text-mark-ink border-mark hover:border-card-ink inline-flex items-center gap-1.5 rounded-[.5rem] border px-2 py-1 text-[.875rem] font-semibold;
+  }
+}

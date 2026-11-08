@@ -126,12 +126,3 @@ export function RemindersCard({ items }: { items: Item[] }) {
     </SideCard>
   );
 }
-
-// Filled in stage 3, when sharing exists.
-export function FriendActivityCard() {
-  return (
-    <SideCard title="Friend activity">
-      <p className="note">Share a link and you will see here when friends open it.</p>
-    </SideCard>
-  );
-}

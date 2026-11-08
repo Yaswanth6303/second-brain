@@ -1,8 +1,11 @@
 import { isValidObjectId } from 'mongoose';
 import { HttpError } from '../../lib/http-error.ts';
 import { BUILTIN_TYPES } from '../../lib/types.ts';
+import { InboxEntry } from '../../models/InboxEntry.ts';
 import { Item, type ItemDoc } from '../../models/Item.ts';
+import { Share } from '../../models/Share.ts';
 import { User } from '../../models/User.ts';
+import { recordProgress } from '../shares/shares.service.ts';
 import type { CreateItemInput, UpdateItemInput } from './items.schemas.ts';
 
 async function assertType(userId: string, type: string) {
@@ -36,12 +39,21 @@ export async function updateItem(
 ): Promise<ItemDoc> {
   const item = await ownItem(userId, id);
   if (patch.type) await assertType(userId, patch.type);
+  const statusChanged = patch.status && patch.status !== item.status;
   item.set(patch);
-  return item.save();
+  await item.save();
+  if (statusChanged && item.fromShare) await recordProgress(userId, item.fromShare, item.status);
+  return item;
 }
 
 export async function deleteItem(userId: string, id: string): Promise<void> {
   const item = await ownItem(userId, id);
-  await item.deleteOne();
-  await User.updateOne({ _id: userId }, { $pull: { shelf: item.id } });
+  // The link also leaves every watchlist and inbox it was shared to.
+  const shares = await Share.find({ item: item.id }).distinct('_id');
+  await Promise.all([
+    item.deleteOne(),
+    User.updateOne({ _id: userId }, { $pull: { shelf: item.id } }),
+    Share.deleteMany({ _id: { $in: shares } }),
+    InboxEntry.deleteMany({ share: { $in: shares } }),
+  ]);
 }

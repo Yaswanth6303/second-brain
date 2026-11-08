@@ -1,10 +1,11 @@
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { http, HttpResponse } from "msw";
+import { delay, http, HttpResponse } from "msw";
 import { describe, expect, it } from "vite-plus/test";
-import { me, mkItem } from "../../../test/fixtures.ts";
+import { me, mkItem, priya } from "../../../test/fixtures.ts";
 import { renderWithProviders } from "../../../test/render.tsx";
 import { server } from "../../../test/server.ts";
+import { SharesProvider } from "../../shares/index.ts";
 import { ItemFormProvider, useItemForm } from "./ItemFormProvider.tsx";
 
 function Harness({ preUrl }: { preUrl?: string }) {
@@ -14,6 +15,7 @@ function Harness({ preUrl }: { preUrl?: string }) {
     <>
       <button onClick={() => form.openNew(preUrl)}>new</button>
       <button onClick={() => form.confirmDelete(item)}>delete</button>
+      <button onClick={() => form.openEdit(item)}>edit</button>
     </>
   );
 }
@@ -35,9 +37,11 @@ function setup(preUrl?: string) {
     }),
   );
   renderWithProviders(
-    <ItemFormProvider>
-      <Harness preUrl={preUrl} />
-    </ItemFormProvider>,
+    <SharesProvider>
+      <ItemFormProvider>
+        <Harness preUrl={preUrl} />
+      </ItemFormProvider>
+    </SharesProvider>,
   );
   return { user: userEvent.setup(), posted };
 }
@@ -73,6 +77,70 @@ describe("ItemForm", () => {
       item: { coll: "Weekend reads", tags: ["essays"], title: "Great work essay" },
     });
     expect(await screen.findByText("Saved to your library")).toBeInTheDocument();
+  });
+
+  it("puts a new link on a friend's watchlist", async () => {
+    const { user, posted } = setup("https://example.com/great-work-essay");
+    server.use(
+      http.get("/api/friends", () =>
+        HttpResponse.json({
+          friends: [{ user: priya, since: "2026-01-01", sent: 0, done: 0, received: 0 }],
+          requests: [],
+          sent: [],
+        }),
+      ),
+      http.post("/api/shares", async ({ request }) => {
+        posted.push({ shares: await request.json() });
+        return HttpResponse.json({ shares: [] }, { status: 201 });
+      }),
+    );
+    await user.click(await screen.findByText("new"));
+    await user.click(await screen.findByRole("checkbox", { name: /Priya Nair/ }));
+    await user.click(screen.getByRole("button", { name: "Save to library" }));
+    expect(await screen.findByText("Saved and added to 1 watchlist")).toBeInTheDocument();
+    expect(posted[1]).toEqual({
+      shares: { itemIds: ["new"], friends: ["p1"], groups: [], handles: [], msg: "" },
+    });
+  });
+
+  it("editing before shares have loaded never unshares anything", async () => {
+    const { user, posted } = setup();
+    const deleted: string[] = [];
+    server.use(
+      http.get("/api/shares/sent", async () => {
+        await delay(60);
+        return HttpResponse.json({
+          shares: [
+            {
+              id: "s1",
+              item: "i1",
+              title: "Old title",
+              kind: "friend",
+              to: priya,
+              seen: "new",
+              seenAt: null,
+              done: [],
+              react: "",
+              at: "2026-11-01",
+            },
+          ],
+        });
+      }),
+      http.delete("/api/shares/:id", ({ params }) => {
+        deleted.push(String(params.id));
+        return new HttpResponse(null, { status: 204 });
+      }),
+      http.patch("/api/items/i1", async ({ request }) =>
+        HttpResponse.json({ item: mkItem("i1", (await request.json()) as object) }),
+      ),
+    );
+    await user.click(await screen.findByText("edit"));
+    await screen.findByRole("heading", { name: "Edit link" });
+    await new Promise((r) => setTimeout(r, 120));
+    await user.click(screen.getByRole("button", { name: "Save changes" }));
+    expect(await screen.findByText("Changes saved")).toBeInTheDocument();
+    expect(deleted).toEqual([]);
+    void posted;
   });
 
   it("deletes after confirming", async () => {

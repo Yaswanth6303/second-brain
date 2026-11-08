@@ -24,3 +24,15 @@ export function Avatar({ name, hue, size = 32 }: { name: string; hue: number; si
     </span>
   );
 }
+
+export function GroupAvatar({ name, size = 32 }: { name: string; size?: number }) {
+  return (
+    <span
+      title={name}
+      className="bg-surface-2 text-ink inline-grid flex-none place-items-center rounded-[30%]"
+      style={{ width: size, height: size, fontSize: size * 0.42 }}
+    >
+      <i className="bi bi-people-fill" />
+    </span>
+  );
+}

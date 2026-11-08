@@ -8,8 +8,8 @@ import {
   ResetPage,
   SignupPage,
 } from "../features/auth/index.ts";
-import { FriendsPage } from "../features/friends/index.ts";
-import { GroupsPage } from "../features/groups/index.ts";
+import { FriendPage, FriendsPage } from "../features/friends/index.ts";
+import { GroupPage, GroupsPage } from "../features/groups/index.ts";
 import { InboxPage } from "../features/inbox/index.ts";
 import { LibraryPage } from "../features/library/index.ts";
 import { ProfilePage } from "../features/profile/index.ts";
@@ -33,7 +33,9 @@ export const routes: RouteObject[] = [
           { path: "/library", element: <LibraryPage /> },
           { path: "/inbox", element: <InboxPage /> },
           { path: "/friends", element: <FriendsPage /> },
+          { path: "/friends/:id", element: <FriendPage /> },
           { path: "/groups", element: <GroupsPage /> },
+          { path: "/groups/:id", element: <GroupPage /> },
           { path: "/profile/:tab?", element: <ProfilePage /> },
           { path: "*", element: <Navigate to="/library" replace /> },
         ],

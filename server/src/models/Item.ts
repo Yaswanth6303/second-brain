@@ -13,6 +13,8 @@ const itemSchema = new Schema(
     note: { type: String, default: '' },
     coll: { type: String, default: '' },
     remindAt: { type: Date, default: null },
+    // Set when the link was saved from someone's share; drives their opened/finished view.
+    fromShare: { type: Types.ObjectId, ref: 'Share', default: null },
   },
   { timestamps: true },
 );
@@ -34,5 +36,6 @@ export function toItemJson(i: ItemDoc) {
     coll: i.coll,
     remindAt: i.remindAt,
     savedAt: i.createdAt,
+    fromShare: i.fromShare ? String(i.fromShare) : null,
   };
 }

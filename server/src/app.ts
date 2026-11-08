@@ -5,7 +5,12 @@ import morgan from 'morgan';
 import { env } from './config/env.ts';
 import { errorHandler, notFound } from './middleware/error.ts';
 import { authRouter } from './modules/auth/auth.routes.ts';
+import { friendsRouter } from './modules/friends/friends.routes.ts';
+import { groupsRouter } from './modules/groups/groups.routes.ts';
+import { inboxRouter } from './modules/inbox/inbox.routes.ts';
 import { itemsRouter } from './modules/items/items.routes.ts';
+import { notificationsRouter } from './modules/notifications/notifications.routes.ts';
+import { sharesRouter } from './modules/shares/shares.routes.ts';
 import { usersRouter } from './modules/users/users.routes.ts';
 
 export function createApp(): Express {
@@ -23,6 +28,11 @@ export function createApp(): Express {
   app.use('/api/auth', authRouter);
   app.use('/api/items', itemsRouter);
   app.use('/api/users', usersRouter);
+  app.use('/api/friends', friendsRouter);
+  app.use('/api/shares', sharesRouter);
+  app.use('/api/inbox', inboxRouter);
+  app.use('/api/groups', groupsRouter);
+  app.use('/api/notifications', notificationsRouter);
 
   app.use(notFound);
   app.use(errorHandler);

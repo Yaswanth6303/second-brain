@@ -87,3 +87,8 @@ export function toSelf(u: UserDoc) {
     })),
   };
 }
+
+// What other people may see about someone.
+export function toPerson(u: Pick<UserDoc, 'id' | 'name' | 'handle' | 'bio' | 'hue'>) {
+  return { id: String(u.id), name: u.name, handle: u.handle, bio: u.bio, hue: u.hue };
+}

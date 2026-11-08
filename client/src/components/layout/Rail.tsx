@@ -1,5 +1,8 @@
 import { NavLink, useLocation, useNavigate, useSearchParams } from "react-router";
 import { useAuth } from "../../features/auth/index.ts";
+import { useFriends } from "../../features/friends/index.ts";
+import { useGroups } from "../../features/groups/index.ts";
+import { useInbox } from "../../features/inbox/index.ts";
 import { tagCounts, useItems } from "../../features/library/index.ts";
 
 const LINKS = [
@@ -27,7 +30,15 @@ export function Rail({ onClose }: { onClose: () => void }) {
   const onLibrary = pathname === "/library";
   const coll = onLibrary ? sp.get("coll") : null;
   const tag = onLibrary ? sp.get("tag") : null;
-  const counts: Record<string, number> = { "/library": items.length };
+  const fresh = useInbox().entries.filter((e) => e.state === "new").length;
+  const friends = useFriends().friends.length;
+  const groups = useGroups().groups.length;
+  const counts: Record<string, number> = {
+    "/library": items.length,
+    "/inbox": fresh,
+    "/friends": friends,
+    "/groups": groups,
+  };
 
   return (
     <div className="flex min-h-full flex-col gap-5 px-3 py-4 lg:py-5">
@@ -61,7 +72,18 @@ export function Rail({ onClose }: { onClose: () => void }) {
                   className={`bi ${l.icon} text-[1.05rem] ${isActive ? "text-brand" : "text-muted"}`}
                 />
                 <span className="min-w-0 flex-1">{l.label}</span>
-                {counts[l.to] ? <span className="n">{counts[l.to]}</span> : null}
+                {counts[l.to] ? (
+                  // New shared links get the prototype's yellow "hot" badge.
+                  <span
+                    className={
+                      l.to === "/inbox"
+                        ? "bg-mark text-mark-ink rounded-full px-[7px] py-px font-mono text-[.72rem] font-medium"
+                        : "n"
+                    }
+                  >
+                    {counts[l.to]}
+                  </span>
+                ) : null}
               </>
             )}
           </NavLink>

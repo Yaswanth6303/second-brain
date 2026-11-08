@@ -3,6 +3,7 @@ import { fmtDay, fmtStamp } from "../../../lib/format.ts";
 import { typeColor } from "../lib/display.ts";
 import { useItemActions } from "../hooks/useItemActions.ts";
 import { type Item, STATUS, type TypeDef } from "../types.ts";
+import { ShareAvatars, useShares } from "../../shares/index.ts";
 import { useItemForm } from "./ItemFormProvider.tsx";
 
 export function TypeIcon({ t }: { t: TypeDef }) {
@@ -103,6 +104,7 @@ const menuItem =
 export function ItemMenu({ item }: { item: Item }) {
   const a = useItemActions();
   const form = useItemForm();
+  const shares = useShares();
   return (
     <Dropdown label="More actions" trigger={<i className="bi bi-three-dots" />}>
       {(close) => (
@@ -131,6 +133,15 @@ export function ItemMenu({ item }: { item: Item }) {
             type="button"
             role="menuitem"
             className={menuItem}
+            onClick={() => (close(), shares.openShare(item))}
+          >
+            <i className="bi bi-send" />
+            Share
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            className={menuItem}
             onClick={() => (close(), a.copy(item))}
           >
             <i className="bi bi-clipboard" />
@@ -149,5 +160,22 @@ export function ItemMenu({ item }: { item: Item }) {
         </div>
       )}
     </Dropdown>
+  );
+}
+
+export function ShareButton({ item, bordered }: { item: Item; bordered?: boolean }) {
+  const { openShare } = useShares();
+  return (
+    <>
+      <ShareAvatars itemId={item.id} />
+      <button
+        type="button"
+        className={`btn-icon ${bordered ? "bordered" : ""}`}
+        aria-label={`Share ${item.title}`}
+        onClick={() => openShare(item)}
+      >
+        <i className="bi bi-send" />
+      </button>
+    </>
   );
 }

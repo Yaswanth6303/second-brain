@@ -1,5 +1,7 @@
 import { useToast } from "../../../components/ui/Toast.tsx";
 import { useAuth } from "../../auth/index.ts";
+import { useInbox } from "../../inbox/index.ts";
+import { useShares } from "../../shares/index.ts";
 import { type Item, type ItemStatus, STATUS } from "../types.ts";
 import { useItemMutations } from "./useItemMutations.ts";
 
@@ -10,16 +12,20 @@ export function useItemActions() {
   const m = useItemMutations();
   const toast = useToast();
   const shelf = useAuth().user!.shelf;
+  const { askReact } = useShares();
+  const { entries } = useInbox();
   const failed = () => toast("Could not save. Try again.");
 
   return {
     onShelf: (item: Item) => shelf.includes(item.id),
     cycleStatus(item: Item) {
       const status = NEXT[item.status];
-      m.update(item.id, { status }).then(
-        () => toast(`Marked as ${STATUS[status].label.toLowerCase()}`),
-        failed,
-      );
+      m.update(item.id, { status }).then(() => {
+        toast(`Marked as ${STATUS[status].label.toLowerCase()}`);
+        // Finishing a link a friend shared directly: offer a line back to them (not for group links).
+        const from = item.fromShare && entries.find((e) => e.shareId === item.fromShare);
+        if (status === "done" && from && !from.group) askReact(from.shareId);
+      }, failed);
     },
     start(item: Item) {
       m.update(item.id, { status: "progress" }).then(

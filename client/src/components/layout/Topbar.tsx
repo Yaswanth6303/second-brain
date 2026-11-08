@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useSearchParams } from "react-router";
 import { useTheme } from "../../context/ThemeContext.tsx";
 import { useAuth } from "../../features/auth/index.ts";
 import { useItemForm } from "../../features/library/index.ts";
+import { Bell } from "../../features/notifications/index.ts";
 import { Avatar } from "../ui/Avatar.tsx";
 import { Button } from "../ui/Button.tsx";
 import { Dropdown, MenuItem } from "../ui/Dropdown.tsx";
@@ -62,18 +63,7 @@ export function Topbar({ onMenu }: { onMenu: () => void }) {
         <i className="bi bi-plus-lg" />
         <span className="hidden sm:inline">Add link</span>
       </Button>
-      <Dropdown
-        label="Notifications"
-        trigger={<i className="bi bi-bell" />}
-        className="w-[min(330px,calc(100vw-32px))] p-1.5"
-      >
-        {() => (
-          <>
-            <h2 className="px-2 pt-2 pb-1">Notifications</h2>
-            <p className="meta px-2 pb-2">Nothing new yet.</p>
-          </>
-        )}
-      </Dropdown>
+      <Bell />
       <button
         type="button"
         className="btn-icon"

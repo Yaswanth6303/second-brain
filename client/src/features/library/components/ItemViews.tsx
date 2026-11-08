@@ -1,6 +1,14 @@
 import { metaLine, typeColor } from "../lib/display.ts";
 import type { Item, TypeDef } from "../types.ts";
-import { ItemMenu, ShelfFavButtons, Stamps, StatusButton, Tags, TypeIcon } from "./bits.tsx";
+import {
+  ItemMenu,
+  ShareButton,
+  ShelfFavButtons,
+  Stamps,
+  StatusButton,
+  Tags,
+  TypeIcon,
+} from "./bits.tsx";
 
 type Props = { item: Item; t: TypeDef; tag: string | null; onTag: (t: string) => void };
 
@@ -30,6 +38,9 @@ export function ItemCard({ item, t, tag, onTag }: Props) {
         <Stamps item={item} />
         <div className="flex min-h-[34px] items-center">
           <StatusButton item={item} />
+          <span className="ml-auto flex flex-none items-center gap-2">
+            <ShareButton item={item} bordered />
+          </span>
         </div>
       </div>
     </article>
@@ -53,6 +64,7 @@ export function ItemRow({ item, t, tag, onTag }: Props) {
       </div>
       <div className="flex flex-nowrap items-center gap-2">
         <StatusButton item={item} />
+        <ShareButton item={item} />
         <ShelfFavButtons item={item} />
         <ItemMenu item={item} />
       </div>

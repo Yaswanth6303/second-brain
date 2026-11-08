@@ -3,9 +3,12 @@ import { Field } from "../../../components/ui/Field.tsx";
 import { Modal } from "../../../components/ui/Modal.tsx";
 import { useToast } from "../../../components/ui/Toast.tsx";
 import { ApiError } from "../../../lib/api-client.ts";
-import { fmtStamp, fromLocalInput, toLocalInput } from "../../../lib/format.ts";
+import { fmtStamp, fromLocalInput, plural, toLocalInput } from "../../../lib/format.ts";
 import { bare, detectType, guessTitle, normUrl } from "../../../lib/url.ts";
+import { useQueryClient } from "@tanstack/react-query";
+import { refreshSocial } from "../../../lib/social-cache.ts";
 import { useAuth } from "../../auth/index.ts";
+import { ShareTargets, applyShareDiff, useSentSharesQuery } from "../../shares/index.ts";
 import { useItemMutations } from "../hooks/useItemMutations.ts";
 import { useItems } from "../hooks/useItems.ts";
 import { tagCounts } from "../lib/filter.ts";
@@ -29,6 +32,15 @@ export function ItemForm({ item, preUrl = "", defaultColl = "", onClose, onSaved
   const { items } = useItems();
   const m = useItemMutations();
   const toast = useToast();
+  const qc = useQueryClient();
+  const sent = useSentSharesQuery();
+  const current = sent.shares.filter((s) => !!item && s.item === item.id);
+  // null until the user changes a tick: until then the item's sharing is left exactly as it is.
+  const [edited, setTargets] = useState<{ friends: string[]; groups: string[] } | null>(null);
+  const targets = edited ?? {
+    friends: current.filter((s) => s.kind === "friend").map((s) => s.to.id),
+    groups: current.filter((s) => s.kind === "group").map((s) => s.to.id),
+  };
   const ids = {
     type: useId(),
     coll: useId(),
@@ -88,7 +100,17 @@ export function ItemForm({ item, preUrl = "", defaultColl = "", onClose, onSaved
       const saved = item ? await m.update(item.id, data) : await m.create(data);
       const shelf = user!.shelf.filter((id) => id !== saved.id);
       if (f.shelf !== onShelf) await m.setShelf(f.shelf ? [...shelf, saved.id] : shelf);
-      toast(item ? "Changes saved" : "Saved to your library");
+      const n = edited
+        ? await applyShareDiff(saved.id, current, { ...edited, handles: [], msg: "" })
+        : 0;
+      if (edited) await refreshSocial(qc);
+      toast(
+        item
+          ? "Changes saved"
+          : n
+            ? `Saved and added to ${plural(n, "watchlist")}`
+            : "Saved to your library",
+      );
       onSaved?.();
       onClose();
     } catch (err) {
@@ -292,6 +314,11 @@ export function ItemForm({ item, preUrl = "", defaultColl = "", onClose, onSaved
           />
           <div className="text-muted mt-1 text-[0.875em]">Leave empty for no reminder.</div>
         </div>
+        {sent.ready ? (
+          <ShareTargets legend="Put it on a watchlist" {...targets} onChange={setTargets} />
+        ) : (
+          <p className="meta m-0">Loading watchlists…</p>
+        )}
         {errors.form && (
           <div
             role="alert"
