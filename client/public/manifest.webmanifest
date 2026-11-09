@@ -1,0 +1,21 @@
+{
+  "id": "/",
+  "name": "Second Brain",
+  "short_name": "Second Brain",
+  "description": "Save links worth coming back to, tag them, and share them with friends.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f1f4f2",
+  "theme_color": "#f1f4f2",
+  "icons": [
+    { "src": "/pwa-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/pwa-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    {
+      "src": "/pwa-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

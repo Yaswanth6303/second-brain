@@ -79,6 +79,15 @@ cd server && bun run dev   # API on http://localhost:4000
 cd client && vp dev        # app on http://localhost:5173 (proxies /api to the API)
 ```
 
+### Install as an app (PWA)
+
+The built app is a Progressive Web App: a web app manifest, icons and a service worker (`client/public/sw.js`) that caches the app shell so it opens offline. API responses are never cached. The worker only runs in builds, so try it with `vp build && vp preview`, or from any HTTPS deployment.
+
+- **Chrome, Edge, Brave, Opera** (desktop and Android): the install icon in the address bar, or the menu → Install.
+- **Safari**: macOS Sonoma or later → File → Add to Dock; iPhone/iPad → Share → Add to Home Screen.
+- **Firefox and Zen**: the app works and caches offline everywhere. Firefox for Android installs it from the menu; desktop Firefox has no install button.
+- **Arc**: the app works and caches offline, but Arc has no install option.
+
 Password reset links are printed in the API's console. No email is sent.
 
 ### Demo data
